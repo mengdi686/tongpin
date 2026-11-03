@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>同频 · 认知同频，兴趣同频</title>
+<meta name="theme-color" content="#ff6b6b" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<link rel="icon" href="icon.svg" type="image/svg+xml" />
+<link rel="manifest" href="manifest.json" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div id="app" class="app">
+
+  <main id="screens">
+
+    <!-- ============ 引导 / 测评 ============ -->
+    <section class="screen screen-onboard is-active" id="screen-onboard">
+      <div class="onboard-progress"><span id="obBar"></span></div>
+
+      <!-- step 0 -->
+      <div class="ob-step is-active" data-step="0">
+        <div class="hero">
+          <div class="hero-logo">同<span>频</span></div>
+          <p class="hero-sub">认知同频，兴趣同频</p>
+          <div class="hero-orbs">
+            <span class="orb o1">旅行</span>
+            <span class="orb o2">音乐</span>
+            <span class="orb o3">美食</span>
+            <span class="orb o4">户外</span>
+            <span class="orb o5">宠物</span>
+          </div>
+        </div>
+        <div class="ob-card">
+          <h2>24 道题，读懂你在关系里的样子</h2>
+          <p class="muted">认知、兴趣、眼缘分开算，不合成一个虚高的分数。</p>
+          <label class="checkline">
+            <input type="checkbox" id="ageGate" />
+            <span>我已满 18 周岁，并同意《用户协议》与《隐私政策》</span>
+          </label>
+          <button class="btn btn-primary" id="obStart" disabled>开始测评</button>
+          <p class="tiny muted center">原型演示环境 · 数据仅保存在本机</p>
+        </div>
+      </div>
+
+      <!-- step 1 -->
+      <div class="ob-step" data-step="1">
+        <h2 class="ob-title">先认识一下你</h2>
+        <div class="avatar-pick">
+          <div class="avatar-preview" id="obAvatarPreview"><span>+</span></div>
+          <input type="file" id="obAvatarInput" accept="image/*" hidden />
+          <p class="tiny muted">点击上传头像（可跳过）</p>
+        </div>
+        <label class="field"><span>昵称</span><input id="obName" maxlength="12" placeholder="比如：小满" /></label>
+        <div class="field-row">
+          <label class="field"><span>年龄</span><input id="obAge" type="number" min="18" max="80" inputmode="numeric" placeholder="24" /></label>
+          <label class="field"><span>城市</span><input id="obCity" maxlength="10" placeholder="上海" /></label>
+        </div>
+        <div class="field">
+          <span>我是</span>
+          <div class="chips" id="obGender">
+            <button class="chip" data-v="f">女生</button>
+            <button class="chip" data-v="m">男生</button>
+            <button class="chip" data-v="x">不愿透露</button>
+          </div>
+        </div>
+        <div class="ob-footer"><button class="btn btn-primary" id="obNext1">下一步</button></div>
+      </div>
+
+      <!-- step 2 -->
+      <div class="ob-step" data-step="2">
+        <h2 class="ob-title">选几个你的兴趣</h2>
+        <p class="muted">至少选 3 个，越准确匹配越准</p>
+        <div class="chips chips-wrap" id="obTags"></div>
+        <div class="ob-footer">
+          <span class="tiny muted" id="tagCount">已选 0 个</span>
+          <button class="btn btn-primary" id="obNext2">下一步</button>
+        </div>
+      </div>
+
+      <!-- step 3 -->
+      <div class="ob-step" data-step="3">
+        <div class="quiz-head">
+          <div class="quiz-dots" id="quizDots"></div>
+          <p class="tiny muted" id="quizStepLabel">第 1 / 24 题</p>
+        </div>
+        <div id="quizBody"></div>
+      </div>
+
+      <!-- step 4：第一眼的心动（照片偏好） -->
+      <div class="ob-step" data-step="4">
+        <h2 class="ob-title center">第一眼的心动</h2>
+        <p class="muted center tiny" id="faceHint">4 张里，选一张你最想认识的</p>
+        <div class="face-dots" id="faceDots"></div>
+        <div class="face-grid" id="faceGrid"></div>
+        <p class="face-note center" id="faceNote">不看资料，也不看条件，凭第一感觉就好。</p>
+        <div class="face-foot">
+          <span class="tiny muted" id="faceStep">第 1 / 6 步</span>
+          <button class="btn btn-ghost btn-sm" id="faceSkip">先跳过</button>
+        </div>
+      </div>
+
+      <!-- step 5 -->
+      <div class="ob-step" data-step="5">
+        <div class="portrait-lead">
+          <p class="pl-kicker">你的同频画像</p>
+          <h2 id="portraitHi">这是现在的你</h2>
+          <p class="pl-sub">24 道题 + 6 轮第一眼 · 之后可随时重测</p>
+        </div>
+        <div class="scale-summary" id="scaleSummary"></div>
+        <h3 class="mini-title">你的兴趣</h3>
+        <div class="portrait-tags" id="portraitTags"></div>
+        <h3 class="mini-title">我们猜你想找的人</h3>
+        <div class="ideal-preview" id="idealPreview"></div>
+        <button class="btn btn-ghost" id="prefAdjust" style="margin-top:8px">调整我的理想型</button>
+        <div class="ob-footer"><button class="btn btn-primary" id="obFinish">进入发现</button></div>
+      </div>
+    </section>
+
+    <!-- ============ 发现 ============ -->
+    <section class="screen" id="screen-discover">
+      <header class="topbar">
+        <div class="brand">同<span>频</span></div>
+        <div class="topbar-actions">
+          <button class="pill" id="todayLikes">今日喜欢 0/5</button>
+          <button class="pill pill-accent" id="btnMember">会员</button>
+        </div>
+      </header>
+
+      <div class="deck" id="deck"></div>
+      <div class="deck-empty" id="deckEmpty" hidden>
+        <div class="empty-emoji">🌿</div>
+        <h3>今天先看到这里</h3>
+        <p class="muted">完善兴趣标签，明天会有更多同频的人</p>
+        <button class="btn btn-ghost" id="btnRefill">刷新一批</button>
+      </div>
+
+      <div class="deck-actions" id="deckActions">
+        <button class="round-btn pass" id="btnPass" aria-label="跳过">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+        <button class="round-btn star" id="btnLike" aria-label="喜欢">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 20.4s-7.4-4.8-7.4-10.4A4.2 4.2 0 0 1 12 7.2a4.2 4.2 0 0 1 7.4 2.8c0 5.6-7.4 10.4-7.4 10.4z"/></svg>
+        </button>
+        <button class="round-btn light" id="btnOpenLikes" aria-label="谁喜欢我">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="2.8"/></svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- ============ 消息 ============ -->
+    <section class="screen" id="screen-matches">
+      <header class="topbar"><div class="brand">消息</div>
+        <div class="topbar-actions"><button class="pill" id="btnLikesEntry">谁喜欢我 <b id="likesBadge">3</b></button></div>
+      </header>
+      <div class="match-list" id="matchList"></div>
+      <div class="hint-card" id="matchHint">
+        <h4>还没有配对</h4>
+        <p class="muted">在「发现」里喜欢的人，如果 TA 也喜欢你，就会出现在这里。</p>
+      </div>
+    </section>
+
+    <!-- ============ 我的 ============ -->
+    <section class="screen" id="screen-me">
+      <div class="me-hero">
+        <div class="me-avatar" id="meAvatar">🙂</div>
+        <div class="me-info">
+          <h2 id="meName">未命名</h2>
+          <p class="muted" id="meMeta">--</p>
+        </div>
+        <button class="pill pill-accent" id="meMemberBtn">开通会员</button>
+      </div>
+      <div class="me-tags" id="meTags"></div>
+      <div class="me-stats">
+        <div><b id="statLikes">0</b><span>喜欢过</span></div>
+        <div><b id="statMatches">0</b><span>配对</span></div>
+      </div>
+      <div class="menu">
+        <button class="menu-item" id="menuFeedback">见面后回访
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+        <button class="menu-item" id="menuPrefs">调整我的理想型
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+        <button class="menu-item" id="menuModels">我的同频报告
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+        <button class="menu-item" id="menuPrivacy">隐私与协议
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+        <button class="menu-item" id="menuReset">清空本机数据
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+      </div>
+      <p class="tiny muted center" style="margin-top:18px">同频 PWA 原型 v0.1 · 演示数据</p>
+    </section>
+  </main>
+
+  <nav class="tabbar" id="tabbar">
+    <button data-tab="discover" class="is-active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5 13.2 13.2 8.5 15.5l2.3-4.7z" fill="currentColor" stroke="none"/></svg>
+      <span>发现</span>
+    </button>
+    <button data-tab="matches">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 11.6a8.6 8.6 0 0 1-12.8 7.5L4 20l1-4.1a8.6 8.6 0 1 1 16-4.3z"/></svg>
+      <span>消息</span>
+    </button>
+    <button data-tab="me">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4.5 20c1.6-4 4.4-6 7.5-6s5.9 2 7.5 6"/></svg>
+      <span>我的</span>
+    </button>
+  </nav>
+</div>
+
+<!-- ============ 聊天覆盖层 ============ -->
+<div class="overlay" id="chatOverlay" hidden>
+  <div class="overlay-card">
+    <header class="chat-head">
+      <button class="icon-btn" id="chatBack" aria-label="返回">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg>
+      </button>
+      <div class="chat-who"><div class="chat-ava" id="chatAva">🙂</div>
+        <div><b id="chatName">TA</b><p class="tiny muted" id="chatMeta">兴趣匹配 · 在线</p></div>
+      </div>
+      <button class="coach-entry" id="chatCoach">红娘</button>
+    </header>
+    <div class="chat-body" id="chatBody"></div>
+    <div class="topic-cards" id="topicCards" hidden></div>
+    <div class="chat-composer">
+      <button class="icon-btn" id="chatImgBtn" aria-label="发送图片">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="9.5" r="1.7" fill="currentColor" stroke="none"/><path d="M4 17l5-5 4 4 3-3 4 4"/></svg>
+      </button>
+      <button class="icon-btn" id="chatVoiceBtn" aria-label="发送语音">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4"/></svg>
+      </button>
+      <input id="chatInput" placeholder="说点什么…" maxlength="200" />
+      <button class="send-btn" id="chatSend">发送</button>
+      <button class="coach-mini" id="coachSpeak" title="让红娘开口">红娘</button>
+      <input type="file" id="chatImgInput" accept="image/*" hidden />
+    </div>
+    <div class="recording-bar" id="recordingBar" hidden>
+      <span class="rec-dot"></span><span id="recTime">00:00</span>
+      <button class="btn btn-ghost btn-sm" id="recStop">停止并发送</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 支付 ============ -->
+<div class="overlay" id="payOverlay" hidden>
+  <div class="sheet">
+    <button class="sheet-close" id="payClose">✕</button>
+    <div class="pay-head"><div class="pay-crown">♛</div><h3>缘趣会员</h3><p class="muted">解锁无限喜欢、谁喜欢我、优先推荐</p></div>
+    <div class="plans" id="plans">
+      <button class="plan is-active" data-plan="month"><b>¥18</b><span>月卡 · 30 天</span></button>
+      <button class="plan" data-plan="year"><b>¥98</b><span>年卡 · 12 个月</span><em>省 54%</em></button>
+    </div>
+    <div class="pay-methods">
+      <label class="pay-method is-active" data-m="wx"><span class="pm-ico">微信</span><span>微信支付</span></label>
+      <label class="pay-method" data-m="ali"><span class="pm-ico ali">支</span><span>支付宝</span></label>
+    </div>
+    <p class="tiny muted center">演示环境：不会真实扣款，不收集支付信息</p>
+    <button class="btn btn-primary" id="payConfirm">确认支付</button>
+    <p class="tiny muted center">正式上线需接入微信/支付宝商户号并部署服务端</p>
+  </div>
+</div>
+
+<!-- ============ 谁喜欢我 ============ -->
+<div class="overlay" id="likesOverlay" hidden>
+  <div class="sheet">
+    <button class="sheet-close" id="likesClose">✕</button>
+    <h3 class="center">谁喜欢我</h3>
+    <p class="muted center">共 <b id="likesCount">3</b> 人喜欢了你</p>
+    <div class="likes-grid" id="likesGrid"></div>
+    <p class="tiny muted center" id="likesLockNote">开通会员后可见头像与昵称</p>
+    <button class="btn btn-primary" id="likesCta">开通会员查看</button>
+  </div>
+</div>
+
+<!-- ============ 配对成功 ============ -->
+<div class="overlay" id="matchOverlay" hidden>
+  <div class="match-celebrate">
+    <p class="tiny">兴趣相投</p>
+    <div class="match-avatars"><div id="mcMe">🙂</div><div class="heart">♥</div><div id="mcTa">🙂</div></div>
+    <h2 id="mcName">你们配对成功了</h2>
+    <p class="muted center" id="mcScore">匹配度 --</p>
+    <button class="btn btn-primary" id="mcChat">马上聊聊</button>
+    <button class="btn btn-ghost" id="mcLater">继续看看</button>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<!-- ============ 红娘建议 ============ -->
+<div class="overlay" id="coachOverlay" hidden>
+  <div class="sheet">
+    <button class="sheet-close" id="coachClose">✕</button>
+    <div class="coach-head">
+      <div class="coach-ava">🧭</div>
+      <div><h3>同频红娘</h3><p class="tiny muted">不推销、不评价、不催进度，只帮你说得出口</p></div>
+    </div>
+    <div class="coach-list" id="coachList"></div>
+    <p class="tiny muted center">建议基于你们两人的画像生成，不是通用话术</p>
+  </div>
+</div>
+
+<!-- ============ 见面后回访 ============ -->
+<div class="overlay" id="fbOverlay" hidden>
+  <div class="sheet">
+    <button class="sheet-close" id="fbClose">✕</button>
+    <h3 class="center">见面后回访</h3>
+    <p class="muted center tiny">这是模型唯一的校准来源：见完面后的真实感受，比任何测评都准</p>
+    <div class="fb-group">
+      <span class="fb-label">对方和照片一致吗？</span>
+      <div class="chips" data-q="photo">
+        <button class="chip" data-v="1">一致</button>
+        <button class="chip" data-v="0">有差距</button>
+      </div>
+    </div>
+    <div class="fb-group">
+      <span class="fb-label">还想再见第二次吗？</span>
+      <div class="chips" data-q="again">
+        <button class="chip" data-v="1">想</button>
+        <button class="chip" data-v="0">不想</button>
+        <button class="chip" data-v="2">不确定</button>
+      </div>
+    </div>
+    <button class="btn btn-primary" id="fbSave" disabled>提交，用于校准匹配</button>
+  </div>
+</div>
+
+<!-- ============ 调整理想型 ============ -->
+<div class="overlay" id="prefsOverlay" hidden>
+  <div class="sheet">
+    <button class="sheet-close" id="prefsClose">✕</button>
+    <h3 class="center">调整我的理想型</h3>
+    <p class="muted center tiny">先看模型猜得对不对，再改。改完匹配会立刻变。</p>
+    <div class="fb-group"><span class="fb-label">城市</span>
+      <div class="chips" data-p="sameCity">
+        <button class="chip" data-v="true">同城优先</button><button class="chip" data-v="false">异地也可以</button>
+      </div>
+    </div>
+    <div class="fb-group"><span class="fb-label">年龄差</span>
+      <div class="chips" data-p="ageRange">
+        <button class="chip" data-v="±3">±3 岁</button><button class="chip" data-v="±5">±5 岁</button><button class="chip" data-v="±10">±10 岁</button>
+      </div>
+    </div>
+    <div class="fb-group"><span class="fb-label">共同兴趣至少</span>
+      <div class="chips" data-p="commonTags">
+        <button class="chip" data-v="1">1 个</button><button class="chip" data-v="2">2 个</button><button class="chip" data-v="3">3 个</button>
+      </div>
+    </div>
+    <div class="fb-group"><span class="fb-label">认证</span>
+      <div class="chips" data-p="verified">
+        <button class="chip" data-v="true">只看已实名</button><button class="chip" data-v="false">都可以</button>
+      </div>
+    </div>
+    <div class="fb-group"><span class="fb-label">节奏</span>
+      <div class="chips" data-p="pace">
+        <button class="chip" data-v="先做朋友">先做朋友</button><button class="chip" data-v="奔着结婚">奔着结婚</button><button class="chip" data-v="看感觉">看感觉</button>
+      </div>
+    </div>
+    <button class="btn btn-primary" id="prefsSave">保存并重新匹配</button>
+  </div>
+</div>
+
+<!-- ============ 资料详情 ============ -->
+<div class="overlay" id="detailOverlay" hidden>
+  <div class="detail-page" id="detailPage"></div>
+</div>
+
+<!-- ============ 我的同频报告 ============ -->
+<div class="overlay" id="modelOverlay" hidden>
+  <div class="sheet">
+    <button class="sheet-close" id="modelClose">✕</button>
+    <h3 class="center">我的同频报告</h3>
+    <p class="muted center tiny">不是标签，是你在关系里的样子</p>
+    <div id="modelBody"></div>
+    <button class="btn btn-ghost btn-sm" id="modelRetake" style="align-self:center">重新做一次测评</button>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>同频 · 匹配</title>
+<meta name="theme-color" content="#ff4d8d">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="match.css">
+</head>
+<body>
+
+<div class="qs-app">
+
+  <!-- ============ 注册（必填：性别 + 生日） ============ -->
+  <section class="qs-onboard" id="onboard" hidden>
+    <div class="onb-top">
+      <div class="onb-brand">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="9" cy="12" r="5.2"></circle><circle cx="15" cy="12" r="5.2"></circle></svg>
+        <b>同频</b><em>认真相遇</em>
+      </div>
+      <div class="onb-steps" id="onbSteps"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    </div>
+    <div class="onb-body" id="onbBody"></div>
+  </section>
+
+  <!-- ============ 推荐 ============ -->
+  <section class="qs-screen is-active" id="screen-reco">
+    <header class="qs-top">
+      <div class="qs-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="12" r="5.2"></circle><circle cx="15" cy="12" r="5.2"></circle></svg>
+        <b>同频</b>
+      </div>
+      <div class="qs-top-actions">
+        <button class="qs-prefs" id="btnPrefs">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3l1.9 4.6L19 9.5l-4.2 3.4L15.5 18 12 15.4 8.5 18l.7-5.1L5 9.5l5.1-1.9z"></path></svg>
+          心动设置
+        </button>
+        <button class="qs-icon-btn" id="btnFilter" aria-label="筛选">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"></path><circle cx="16" cy="7" r="2"></circle><circle cx="8" cy="17" r="2"></circle></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="qs-subline">
+      <span class="qs-city">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 21s-6.5-5.4-6.5-10.2A6.5 6.5 0 0 1 12 4.3a6.5 6.5 0 0 1 6.5 6.5C18.5 15.6 12 21 12 21z"></path><circle cx="12" cy="10.6" r="2.2"></circle></svg>
+        上海 · 全城
+      </span>
+      <span class="qs-update">今日推荐 <b id="dailyCount">无限</b> 次 · 不限左右划</span>
+    </div>
+
+    <div class="qs-trust">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 3l7 3v5.4c0 4.4-2.9 7.8-7 9.6-4.1-1.8-7-5.2-7-9.6V6z"></path><path d="M9 12l2.1 2.1L15.4 10"></path></svg>
+      本页用户均通过 实名 + 真人认证
+    </div>
+
+    <button class="qs-birth-nudge" id="birthNudge" hidden>
+      <span class="qb-nudge-ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="8.4"></circle><path d="M12 7.6v4.9l3 1.8"></path></svg>
+      </span>
+      <span class="qb-nudge-main"><b>补充出生时间</b><i>八字合盘会更准，只影响匹配，不会公开</i></span>
+      <span class="qb-nudge-go">去补充</span>
+    </button>
+
+    <button class="qs-setup" id="setupBanner" hidden>
+      <span class="qs-setup-ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"></path><path d="M18 16l.7 1.8L20.5 18l-1.8.7L18 20.5l-.7-1.8L15.5 18l1.8-.7z"></path></svg>
+      </span>
+      <span class="qs-setup-main"><b>心动画像还没完善</b><i>6 轮看照片 + 12 道轻测评，推荐会更准</i></span>
+      <span class="qs-setup-go">去完善</span>
+    </button>
+
+    <button class="qs-act" id="actBanner" hidden>
+      <span class="qa-ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.2" y="8.2" width="17.6" height="12.4" rx="2.4"></rect><path d="M3.2 12.4h17.6M12 8.2v12.4"></path><path d="M12 8.2S10.8 4 7.9 4.6c-2 .4-2.3 3.6 4.1 3.6zM12 8.2s1.2-4.2 4.1-3.6c2 .4 2.3 3.6-4.1 3.6z"></path></svg>
+      </span>
+      <span class="qa-main"><b>新人活动 · 完善资料卡</b><i>2–6 张照片 + 500 字介绍，完成送 500 积分</i></span>
+      <span class="qa-go">去领</span>
+    </button>
+
+    <div class="qs-feed" id="feed">
+      <div id="cardHost">
+  <article class="qs-card is-in" data-id="jiajia">
+    <div class="qs-photo">
+      <img src="assets/match/liujiajia.jpg" alt="刘佳佳的照片" draggable="false">
+      <div class="qs-photo-top">
+        <span class="qs-photo-tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"></path><path d="M18 16l.7 1.8L20.5 18l-1.8.7L18 20.5l-.7-1.8L15.5 18l1.8-.7z"></path></svg>每日推荐</span>
+        <span class="qs-photo-count"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 21s-6.5-5.4-6.5-10.2A6.5 6.5 0 0 1 12 4.3a6.5 6.5 0 0 1 6.5 6.5C18.5 15.6 12 21 12 21z"></path><circle cx="12" cy="10.6" r="2.2"></circle></svg>距你 3.2km</span>
+      </div>
+      <div class="qs-photo-name">
+        <b>刘佳佳</b><span>27</span>
+        <span class="qs-vbadge" title="真人认证"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span>
+      </div>
+    </div>
+    <div class="qs-body">
+      <div class="qs-tags"><span class="qs-tag hot">浙江大学</span><span class="qs-tag hot">每年带家人旅行</span><span class="qs-tag hot">乐天派</span><span class="qs-tag">UI 设计师</span><span class="qs-tag">爱养花</span><span class="qs-tag">周末看展</span><span class="qs-tag">普拉提</span></div>
+      <div class="qs-score">
+        <span class="qs-score-dot"></span>
+        <span class="qs-score-label">同频契合度<small>认知 · 兴趣 · 眼缘加权</small></span>
+        <span class="qs-score-val">96<em>%</em></span>
+      </div>
+      <p class="qs-bio">爱运动，也爱在周末逛展。希望有人一起，把普通的日子过得有意思。</p>
+
+      <div class="qs-sec">
+        <h4>基本资料</h4>
+        <div class="qs-facts"><div class="qs-fact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15L15 4l5 5L9 20z"></path><path d="M8 11l2 2M11 8l2 2M14 5l2 2"></path></svg><b>165cm</b></div><div class="qs-fact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3.6l2.5 5.3 5.7.7-4.2 4 1.1 5.7-5.1-2.8-5.1 2.8 1.1-5.7-4.2-4 5.7-.7z"></path></svg><b>双子座</b></div><div class="qs-fact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-5 9 5-9 5z"></path><path d="M7 12v4c0 1.7 2.2 3 5 3s5-1.3 5-3v-4"></path></svg><b>浙江大学 · 本科</b></div><div class="qs-fact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7.5" width="18" height="12.5" rx="2.5"></rect><path d="M9 7.5V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v1.5"></path></svg><b>互联网 · UI 设计师</b></div></div>
+      </div>
+
+      <div class="qs-sec">
+        <h4>关于我</h4>
+        <p class="qs-about">杭州读完大学，来上海第五年。工作忙，但生活不将就：下班去滨江跑步，周末下厨或看展。</p>
+      </div>
+
+      <div class="qs-sec">
+        <h4>兴趣标签</h4>
+        <div class="qs-tagcloud"><span>摄影</span><span>当代艺术</span><span>普拉提</span><span>咖啡</span><span>旅行</span></div>
+      </div>
+
+      <div class="qs-sec">
+        <h4>恋爱测评</h4>
+        <div class="qs-tests"><div class="qs-test"><span>恋爱人格</span><b>可靠的陪伴者</b></div><div class="qs-test"><span>情绪稳定</span><b>偏高</b></div><div class="qs-test"><span>冲突处理</span><b>先冷静，再沟通</b></div></div>
+      </div>
+
+      <div class="qs-sec">
+        <h4>认证信息</h4>
+        <div class="qs-verifies">
+    <div class="qs-verify">
+      <span class="qs-vbadge"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span>
+      <p>实名认证</p><i>身份证认证</i>
+    </div>
+    <div class="qs-verify">
+      <span class="qs-vbadge"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span>
+      <p>真实头像认证</p><i>人脸比对</i>
+    </div>
+    <div class="qs-verify">
+      <span class="qs-vbadge"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span>
+      <p>学历认证</p><i>学信网认证</i>
+    </div></div>
+      </div>
+    </div>
+  </article></div>
+      <div class="qs-done" id="done" hidden="">
+        <div class="qs-done-ico">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M12 20.6s-7-4.6-7-9.8A4 4 0 0 1 12 7.8a4 4 0 0 1 7 3c0 5.2-7 9.8-7 9.8z"></path><path d="M9.6 11.6l1.7 1.7 3.1-3.4"></path></svg>
+        </div>
+        <h3 id="doneTitle">这一轮看完啦</h3>
+        <p id="doneText">推荐不限次数，随时可以继续</p>
+        <div class="qs-done-actions">
+          <button class="qs-btn-grad" id="doneRestart">再看一轮</button>
+          <button class="qs-btn-line" id="donePrefs">调整筛选条件</button>
+        </div>
+      </div>
+
+      <!-- 广场并入推荐 -->
+      <div class="qs-feed-plaza" id="plazaInline" hidden>
+        <div class="qs-feed-plaza-head">
+          <div>
+            <h3>同频广场</h3>
+            <p>从日常里，先认识一个人</p>
+          </div>
+          <span>已认证</span>
+        </div>
+        <div class="qs-plaza" id="plazaList"></div>
+      </div>
+    </div>
+
+    <footer class="qs-actionbar" id="actionbar">
+      <button class="qs-skip" id="btnPass" aria-label="不合适">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M7 7l10 10M17 7L7 17"></path></svg>
+      </button>
+      <button class="qs-flower" id="btnFlower">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 4c1.6 2.2 3.3 3.1 5.4 2.6-.5 2.1.4 3.8 2.6 5.4-2.2 1.6-3.1 3.3-2.6 5.4-2.1-.5-3.8.4-5.4 2.6-1.6-2.2-3.3-3.1-5.4-2.6.5-2.1-.4-3.8-2.6-5.4 2.2-1.6 3.1-3.3 2.6-5.4C8.7 7.1 10.4 6.2 12 4z"></path><circle cx="12" cy="12" r="1.6"></circle></svg>
+        送朵花
+      </button>
+      <button class="qs-like" id="btnLike">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 20.4s-7.4-4.8-7.4-10.4A4.2 4.2 0 0 1 12 7.2a4.2 4.2 0 0 1 7.4 2.8c0 5.6-7.4 10.4-7.4 10.4z"></path></svg>
+        喜欢 TA
+      </button>
+    </footer>
+  </section>
+
+  <!-- ============ 喜欢 ============ -->
+  <section class="qs-screen" id="screen-likes">
+    <header class="qs-page-head">
+      <h2>喜欢</h2>
+      <p>双向喜欢，才会开启聊天</p>
+    </header>
+
+    <div class="qs-like-stats">
+      <div><b id="statViews">18</b><span>看过我</span></div>
+      <div><b id="statLikes">4</b><span>喜欢我</span></div>
+      <div class="is-gold"><b id="statZheng">2</b><span>其中的正缘</span></div>
+    </div>
+
+    <div class="qs-seg" id="likeSeg">
+      <button class="is-on">谁喜欢我 <b id="likeWhoCount">4</b></button>
+      <button>我喜欢 <b id="likeMineCount">2</b></button>
+    </div>
+    <div class="qs-likes-grid" id="likesGrid">
+    <div class="qs-like-card " data-id="jiajia" data-locked="0">
+      <img src="assets/match/liujiajia.jpg" alt="刘佳佳">
+      <div class="lc-shade"></div>
+      <span class="lc-badge">已认证</span>
+      <div class="lc-name">刘佳佳 <i>27</i></div>
+      
+    </div>
+    <div class="qs-like-card " data-id="chenyu" data-locked="0">
+      <img src="assets/match/chenyu.jpg" alt="陈屿">
+      <div class="lc-shade"></div>
+      <span class="lc-badge">已认证</span>
+      <div class="lc-name">陈屿 <i>30</i></div>
+      
+    </div>
+    <div class="qs-like-card locked" data-id="linwan" data-locked="1">
+      <img src="assets/match/linwan.jpg" alt="林晚">
+      <div class="lc-shade"></div>
+      <span class="lc-badge">已认证</span>
+      <div class="lc-name">林晚 <i>26</i></div>
+      <div class="lc-lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="4.5" y="10" width="15" height="10" rx="2.5"></rect><path d="M8 10V7.5a4 4 0 0 1 8 0V10"></path></svg><span>开通 VIP 查看</span></div>
+    </div>
+    <div class="qs-like-card locked" data-id="suqing" data-locked="1">
+      <img src="assets/match/suqing.jpg" alt="苏晴">
+      <div class="lc-shade"></div>
+      <span class="lc-badge">已认证</span>
+      <div class="lc-name">苏晴 <i>29</i></div>
+      <div class="lc-lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="4.5" y="10" width="15" height="10" rx="2.5"></rect><path d="M8 10V7.5a4 4 0 0 1 8 0V10"></path></svg><span>开通 VIP 查看</span></div>
+    </div></div>
+    <div class="qs-vip-tip">
+      <div>
+        <h4 id="vipTipTitle">还有 2 个人想认识你</h4>
+        <p id="vipTipText">开通 VIP 后可查看全部 · 每日推荐不限次数</p>
+      </div>
+      <button id="btnVip2">查看</button>
+    </div>
+    <div class="qs-page-note">资料均通过实名与扫脸认证</div>
+  </section>
+
+  <!-- ============ 我的 ============ -->
+  <section class="qs-screen" id="screen-me">
+    <div class="qs-me-hero">
+      <div class="qs-me-ava" id="meAva">知</div>
+      <div class="qs-me-main">
+        <h2><span id="meName">知夏</span> <span id="meAge">28</span></h2>
+        <p id="meSub">女生 · 上海 · 认真找对象</p>
+        <div class="qs-me-badge" id="meBadge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3l7 3v5.4c0 4.4-2.9 7.8-7 9.6-4.1-1.8-7-5.2-7-9.6V6z"></path><path d="M9 12l2.1 2.1L15.4 10"></path></svg>
+          <span>实名认证 · 扫脸认证</span>
+        </div>
+      </div>
+      <button class="qs-me-vip" id="btnVip3">VIP</button>
+    </div>
+    <div class="qs-me-stats">
+      <div><b id="meStatLikes">4</b><span>喜欢我</span></div>
+      <div><b id="meStatViews">18</b><span>看过我</span></div>
+      <div><b id="meStatZheng">2</b><span>其中的正缘</span></div>
+    </div>
+    <div class="qs-me-menu">
+      <button class="qs-me-row is-act" id="meProfile"><span>我的资料卡 <em id="meProfileTag">领 500 积分</em></span><i id="meProfileState">未完善</i></button>
+      <button class="qs-me-row" id="mePoints"><span>我的积分</span><i id="mePointsState">0 积分</i></button>
+      <button class="qs-me-row" id="mePortrait"><span>心动画像</span><i id="mePortraitState">还没完善</i></button>
+      <button class="qs-me-row" id="meBirth"><span>出生时间 · 八字合盘</span><i id="meBirthState">待补充</i></button>
+      <button class="qs-me-row" id="mePrefs"><span>心动偏好设置</span><i>已设置 3 项</i></button>
+      <button class="qs-me-row is-zheng" id="meZheng"><span>八字正缘 · 精准推荐</span><i id="meZhengState">单独开通</i></button>
+      <button class="qs-me-row" id="meVip"><span>同频 VIP</span><i id="meVipState">查看谁喜欢我</i></button>
+      <button class="qs-me-row" id="meVerify"><span>我的认证</span><i id="meVerifyState">实名 + 扫脸</i></button>
+    </div>
+    <p class="qs-me-foot">「同频」匹配页原型 · 认知 / 兴趣 / 八字 分开计算<br>仅用于演示，数据为虚构</p>
+  </section>
+
+  <!-- ============ 消息（底边栏） ============ -->
+  <section class="qs-screen" id="screen-msg">
+    <header class="qs-page-head">
+      <h2>消息</h2>
+      <p>互相喜欢后，在这里开始对话</p>
+    </header>
+    <div class="qs-msg-list" id="msgList"></div>
+    <div class="qs-msg-empty" id="msgEmpty" hidden>
+      <div class="qs-msg-empty-ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M21 11.6a8.6 8.6 0 0 1-12.8 7.5L4 20l1-4.1a8.6 8.6 0 1 1 16-4.3z"></path></svg>
+      </div>
+      <h3>还没有聊天</h3>
+      <p>和 TA 互相喜欢之后<br>会在这里开启对话</p>
+    </div>
+  </section>
+
+  <!-- ============ 底部导航 ============ -->
+  <nav class="qs-tabs" id="tabbar">
+    <button data-tab="reco" class="is-active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 3l2.4 6.6L21 12l-6.6 2.4L12 21l-2.4-6.6L3 12l6.6-2.4z"></path></svg>
+      <span>推荐</span>
+    </button>
+    <button data-tab="likes" class="">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 20.4s-7.4-4.8-7.4-10.4A4.2 4.2 0 0 1 12 7.2a4.2 4.2 0 0 1 7.4 2.8c0 5.6-7.4 10.4-7.4 10.4z"></path></svg>
+      <span>喜欢</span>
+    </button>
+    <button data-tab="msg" class="">
+      <span class="qs-tab-ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M21 11.4a8.4 8.4 0 0 1-12.5 7.4L4 20l1.2-4a8.4 8.4 0 1 1 15.8-4.6z"></path></svg>
+        <em class="qs-tab-badge" id="msgBadge" hidden>0</em>
+      </span>
+      <span>消息</span>
+    </button>
+    <button data-tab="me" class="">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="8" r="3.6"></circle><path d="M5 20c1.5-3.8 3.9-5.7 7-5.7s5.5 1.9 7 5.7"></path></svg>
+      <span>我的</span>
+    </button>
+  </nav>
+
+  <!-- ============ 聊天 ============ -->
+  <section class="qs-subpage qs-chat" id="subChat" hidden>
+    <header class="qs-chat-head">
+      <button class="qs-sub-back" id="chatBack" aria-label="返回">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M15 5L8 12l7 7"></path></svg>
+      </button>
+      <div class="qs-chat-who">
+        <div class="qs-chat-ava" id="chatAva"></div>
+        <b id="chatName">TA</b>
+        <span class="qs-vbadge" title="真人认证">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
+        </span>
+      </div>
+      <span class="qs-chat-status" id="chatMeta"></span>
+    </header>
+    <div class="qs-chat-body" id="chatBody"></div>
+    <div class="qs-ai-sug" id="aiSug">
+      <div class="qs-ai-sug-head">
+        <span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"></path></svg>
+          <span id="aiSugTitle">AI 回复建议</span>
+        </span>
+        <button id="aiRefresh">换一批</button>
+      </div>
+      <div class="qs-ai-chips" id="aiChips"></div>
+    </div>
+    <form class="qs-chat-composer" id="chatForm">
+      <input id="chatInput" placeholder="说点什么…" autocomplete="off" maxlength="120">
+      <button type="submit" class="qs-chat-send">发送</button>
+    </form>
+  </section>
+
+  <!-- ============ 心动画像向导 ============ -->
+  <section class="qs-wizard" id="wizard" hidden>
+    <div class="qw-top">
+      <button class="qw-skip" id="qwSkip">先逛逛</button>
+      <div class="qw-progress"><span id="qwBar"></span></div>
+      <span class="qw-count" id="qwCount"></span>
+    </div>
+    <div class="qw-body" id="qwBody"></div>
+  </section>
+</div>
+
+<!-- ============ 心动设置 ============ -->
+<div class="qs-overlay prefs-overlay" id="sheetPrefs" hidden="">
+  <div class="qs-sheet qs-sheet-prefs" role="dialog" aria-modal="true" aria-label="心动设置">
+    <header class="qs-sheet-head">
+      <button class="qs-sheet-x" data-close="" aria-label="关闭">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M7 7l10 10M17 7L7 17"></path></svg>
+      </button>
+    </header>
+    <div class="qs-prefs-body">
+      <h2>下面哪些点<br><span>比较吸引你</span>？</h2>
+      <p class="qs-prefs-sub">选 3–5 个最在意的，推荐会更贴近你</p>
+      <button class="qs-portrait-entry" id="prefPortrait">
+        <span class="pe-ico">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8.4"></circle><path d="M12 8v4.4l2.8 1.8"></path></svg>
+        </span>
+        <span class="pe-main">
+          <b>我的心动画像</b>
+          <i id="peState">还没完善 · 推荐只能靠基础条件</i>
+        </span>
+        <span class="pe-go" id="peGo">去完善</span>
+      </button>
+      <button class="qs-prefs-top" id="prefTop">
+        最在意的点 <b>已选 3 个</b>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20h4l10-10-4-4L4 16z"></path><path d="M13.5 5.5l4 4"></path></svg>
+      </button>
+      <div class="qs-bubbles" id="bubbleCloud"><button class="qs-bubble b2 " data-tag="生活丰富">生活丰富</button><button class="qs-bubble b3 is-on" data-tag="圈子简单">圈子简单</button><button class="qs-bubble b1 " data-tag="工作生活平衡">工作生活平衡</button><button class="qs-bubble b3 " data-tag="恋爱小白">恋爱小白</button><button class="qs-bubble b2 " data-tag="生活规律">生活规律</button><button class="qs-bubble b1 " data-tag="自律">自律</button><button class="qs-bubble b2 is-on" data-tag="有生活气息">有生活气息</button><button class="qs-bubble b3 " data-tag="喜欢宅家">喜欢宅家</button><button class="qs-bubble b1 " data-tag="旅行">旅行</button><button class="qs-bubble b1 " data-tag="吃货">吃货</button><button class="qs-bubble b2 is-on" data-tag="情绪稳定">情绪稳定</button><button class="qs-bubble b3 " data-tag="爱运动">爱运动</button></div>
+    </div>
+    <div class="qs-prefs-foot">
+      <button class="qs-btn-grad" id="prefSave">选好了</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 筛选 ============ -->
+<div class="qs-overlay" id="sheetFilter" hidden="">
+  <div class="qs-sheet" role="dialog" aria-modal="true" aria-label="筛选">
+    <header class="qs-sheet-head">
+      <h3>筛选</h3>
+      <button class="qs-sheet-x" data-close="" aria-label="关闭">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M7 7l10 10M17 7L7 17"></path></svg>
+      </button>
+    </header>
+    <div class="qs-zheng-entry">
+      <span class="qz-entry-ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="8.6"></circle><path d="M12 3.4a8.6 8.6 0 0 0 0 17.2"></path><circle cx="12" cy="8.4" r="1.1" fill="currentColor" stroke="none"></circle><circle cx="12" cy="15.6" r="1.1" fill="currentColor" stroke="none"></circle></svg>
+      </span>
+      <span class="qz-entry-main">
+        <b>只看八字正缘</b>
+        <i>按生辰合盘，只推荐互为正缘的人</i>
+      </span>
+      <button class="qz-entry-btn" id="zhengFilterBtn">开通</button>
+    </div>
+    <div class="qs-sheet-scroll" id="filterGroups">
+    <div class="qs-filter-group">
+      <h4>年龄</h4>
+      <div class="qs-filter-chips" data-g="0">
+        <button class="qs-filter-chip " data-o="0">22–26</button><button class="qs-filter-chip " data-o="1">27–30</button><button class="qs-filter-chip " data-o="2">31–35</button><button class="qs-filter-chip is-on" data-o="3">不限</button>
+      </div>
+    </div>
+  
+    <div class="qs-filter-group">
+      <h4>身高</h4>
+      <div class="qs-filter-chips" data-g="1">
+        <button class="qs-filter-chip " data-o="0">155+</button><button class="qs-filter-chip " data-o="1">165+</button><button class="qs-filter-chip " data-o="2">175+</button><button class="qs-filter-chip is-on" data-o="3">不限</button>
+      </div>
+    </div>
+  
+    <div class="qs-filter-group">
+      <h4>学历</h4>
+      <div class="qs-filter-chips" data-g="2">
+        <button class="qs-filter-chip " data-o="0">本科及以上</button><button class="qs-filter-chip " data-o="1">硕士及以上</button><button class="qs-filter-chip is-on" data-o="2">不限</button>
+      </div>
+    </div>
+  
+    <div class="qs-filter-group">
+      <h4>当前位置</h4>
+      <div class="qs-filter-chips" data-g="3">
+        <button class="qs-filter-chip " data-o="0">上海</button><button class="qs-filter-chip " data-o="1">杭州</button><button class="qs-filter-chip " data-o="2">苏州</button><button class="qs-filter-chip is-on" data-o="3">不限</button>
+      </div>
+    </div>
+  
+    <div class="qs-filter-group">
+      <h4>认证</h4>
+      <div class="qs-filter-chips" data-g="4">
+        <button class="qs-filter-chip is-on" data-o="0">实名 + 真人</button><button class="qs-filter-chip " data-o="1">学历认证</button><button class="qs-filter-chip " data-o="2">不限</button>
+      </div>
+    </div>
+  </div>
+    <div class="qs-sheet-foot">
+      <button class="qs-btn-line" id="filterReset">重置</button>
+      <button class="qs-btn-grad" id="filterApply">查看 12 位</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ VIP ============ -->
+<div class="qs-overlay" id="sheetVip" hidden="">
+  <div class="qs-sheet" role="dialog" aria-modal="true" aria-label="同频 VIP">
+    <header class="qs-sheet-head">
+      <h3>同频 VIP</h3>
+      <button class="qs-sheet-x" data-close="" aria-label="关闭">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M7 7l10 10M17 7L7 17"></path></svg>
+      </button>
+    </header>
+    <div class="qs-sheet-scroll">
+      <p class="qs-vip-lead">认真找对象的人，值得更高效地遇见</p>
+      <div class="qs-vip-benefits">
+        <span>查看谁喜欢我</span><span>查看谁看过我</span><span>不限查看次数</span>
+      </div>
+      <div class="qs-plans" id="vipPlans">
+        <button class="qs-plan" data-price="60">
+          <b>1 个月</b><span>¥60 / 月</span>
+        </button>
+        <button class="qs-plan is-on" data-price="138">
+          <em>最受欢迎</em><b>3 个月</b><span>¥138 / 季</span>
+        </button>
+        <button class="qs-plan" data-price="388">
+          <b>12 个月</b><span>¥388 / 年</span>
+        </button>
+      </div>
+      <p class="qs-vip-note">自动续费，可随时取消 · 原型演示不产生真实扣费</p>
+    </div>
+    <div class="qs-sheet-foot">
+      <button class="qs-btn-grad" id="vipBuy">立即开通 ¥138</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 八字正缘（单独付费） ============ -->
+<div class="qs-overlay" id="sheetZheng" hidden="">
+  <div class="qs-sheet qs-sheet-zheng" role="dialog" aria-modal="true" aria-label="八字正缘">
+    <header class="qs-sheet-head">
+      <h3>八字正缘</h3>
+      <button class="qs-sheet-x" data-close="" aria-label="关闭">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M7 7l10 10M17 7L7 17"></path></svg>
+      </button>
+    </header>
+    <div class="qs-sheet-scroll">
+      <div class="qz-hero">
+        <div class="qz-ring"><span>正缘</span></div>
+        <p>按你的生辰八字，只推荐与你<br><b>互为正缘</b>的人</p>
+      </div>
+      <div class="qs-vip-benefits qz-benefits">
+        <span>合盘为正缘</span><span>夫妻宫相合</span><span>用神互补</span>
+      </div>
+      <div class="qz-price">
+        <b>¥<em>29</em></b>
+        <span>一次买断 · 不限推荐与左右划次数</span>
+      </div>
+      <p class="qs-vip-note">正缘推荐是单独功能，与 VIP 分开 · 原型演示不产生真实扣费</p>
+    </div>
+    <div class="qs-sheet-foot">
+      <button class="qs-btn-zheng" id="zhengBuy">¥29 开通八字正缘</button>
+    </div>
+    <button class="qs-zheng-tip" id="zhengCloseTip">先不开通，继续看全部推荐</button>
+  </div>
+</div>
+
+<!-- ============ 出生时间 ============ -->
+<div class="qs-overlay" id="sheetBirth" hidden="">
+  <div class="qs-sheet" role="dialog" aria-modal="true" aria-label="出生时间">
+    <header class="qs-sheet-head">
+      <h3>出生时间</h3>
+      <button class="qs-sheet-x" data-close="" aria-label="关闭">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M7 7l10 10M17 7L7 17"></path></svg>
+      </button>
+    </header>
+    <div class="qs-sheet-scroll">
+      <p class="qs-birth-lead">知道出生时辰，八字合盘会更准。<br>不确定也没关系，可以之后再补。</p>
+      <div class="qs-birth-selects">
+        <select id="birthHour" aria-label="出生小时"></select>
+        <select id="birthMin" aria-label="出生分钟"></select>
+      </div>
+      <p class="qs-vip-note">出生时间只用于合盘计算，不会对外展示</p>
+    </div>
+    <div class="qs-sheet-foot">
+      <button class="qs-btn-line" id="birthUnknown">不确定</button>
+      <button class="qs-btn-grad" id="birthSave">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 我的资料卡（完善资料送 500 积分） ============ -->
+<div class="qs-overlay" id="sheetProfile" hidden="">
+  <div class="qs-sheet qs-sheet-tall" role="dialog" aria-modal="true" aria-label="我的资料卡">
+    <header class="qs-sheet-head">
+      <h3>我的资料卡</h3>
+      <span class="qs-sheet-reward" id="pfRewardTag">完成 +500 积分</span>
+      <button class="qs-sheet-x" data-close="" aria-label="关闭">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M7 7l10 10M17 7L7 17"></path></svg>
+      </button>
+    </header>
+    <div class="qs-sheet-scroll">
+      <p class="qs-pf-lead">资料卡就是别人在推荐页看到的你。照片 2–6 张，文案合计 500 字以内。</p>
+      <div class="qs-pf-block">
+        <div class="qs-pf-label"><b>照片</b><i id="pfPhotoTip">至少 2 张，最多 6 张</i></div>
+        <div class="qs-pf-photos" id="pfPhotos"></div>
+      </div>
+      <div class="qs-pf-block">
+        <div class="qs-pf-label"><b>一句介绍</b><i>让人一眼记住你</i></div>
+        <textarea class="qs-pf-input" id="pfBio" maxlength="60" placeholder="例：杭州读完大学，来上海第五年。工作忙，但生活不将就。"></textarea>
+      </div>
+      <div class="qs-pf-block">
+        <div class="qs-pf-label"><b>关于我</b><i>日常、工作、习惯</i></div>
+        <textarea class="qs-pf-input is-tall" id="pfAbout" maxlength="300" placeholder="例：下班去滨江跑步，周末下厨或看展，偶尔一个人去看电影。"></textarea>
+      </div>
+      <div class="qs-pf-block">
+        <div class="qs-pf-label"><b>期待的关系</b><i>你想遇到什么样的人</i></div>
+        <textarea class="qs-pf-input" id="pfExpect" maxlength="140" placeholder="例：想找一个愿意一起把普通日子过好的人。"></textarea>
+      </div>
+      <div class="qs-pf-block">
+        <div class="qs-pf-label"><b>兴趣标签</b><i>最多 5 个</i></div>
+        <div class="qs-pf-tags" id="pfTags"></div>
+      </div>
+      <div class="qs-pf-count" id="pfCountText">已写 0 / 500 字</div>
+    </div>
+    <div class="qs-sheet-foot">
+      <button class="qs-btn-line" data-close="">稍后</button>
+      <button class="qs-btn-grad" id="pfSave">保存资料</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 我的积分 ============ -->
+<div class="qs-overlay" id="sheetPoints" hidden="">
+  <div class="qs-sheet qs-sheet-tall" role="dialog" aria-modal="true" aria-label="我的积分">
+    <header class="qs-sheet-head">
+      <h3>我的积分</h3>
+      <button class="qs-sheet-x" data-close="" aria-label="关闭">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M7 7l10 10M17 7L7 17"></path></svg>
+      </button>
+    </header>
+    <div class="qs-sheet-scroll">
+      <div class="qs-pt-hero">
+        <b id="pointsBalance">0</b><span>积分</span>
+        <p>完善资料卡 +500 · 邀请好友双方各 +200</p>
+      </div>
+      <h4 class="qs-pt-h">积分能做什么</h4>
+      <div class="qs-pt-list" id="pointsRewards"></div>
+      <h4 class="qs-pt-h">怎么获得积分</h4>
+      <div class="qs-pt-rules">
+        <div class="qs-pt-rule"><span>完善资料卡（2–6 张照片 + 文案）</span><b>+500</b></div>
+        <div class="qs-pt-rule"><span>邀请好友注册，双方各得</span><b>+200</b></div>
+        <div class="qs-pt-rule"><span>每日签到</span><b>+10</b></div>
+        <div class="qs-pt-rule"><span>分享合盘卡被打开</span><b>+30</b></div>
+      </div>
+      <p class="qs-vip-note">积分只用于站内权益，不能提现 · 原型演示不产生真实扣费</p>
+    </div>
+    <div class="qs-sheet-foot">
+      <button class="qs-btn-line" id="ptInvite">邀请好友</button>
+      <button class="qs-btn-grad" id="ptDaily">每日签到 +10</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 牵手成功 ============ -->
+<div class="qs-match" id="matchOverlay" hidden="">
+  <div class="qs-match-inner">
+    <p class="qs-match-kicker">✦ 恭喜 ✦</p>
+    <div class="qs-match-avas">
+      <div class="qs-match-ava me">知</div>
+      <div class="qs-match-heart">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 20.4s-7.4-4.8-7.4-10.4A4.2 4.2 0 0 1 12 7.2a4.2 4.2 0 0 1 7.4 2.8c0 5.6-7.4 10.4-7.4 10.4z"></path></svg>
+      </div>
+      <div class="qs-match-ava" id="matchAva"></div>
+    </div>
+    <h2>你和 <span id="matchName">TA</span> 牵手成功</h2>
+    <p class="qs-match-sub" id="matchSub">你们都选择了「周末散步」<br>在同频相遇的第 3 天</p>
+    <button class="qs-match-btn" id="btnSayHi">去打个招呼</button>
+    <button class="qs-match-ghost" id="btnKeep">继续看看</button>
+  </div>
+</div>
+
+<div class="qs-toast" id="toast" hidden=""></div>
+
+<script src="match.js"></script>
+
+
+</body></html>
