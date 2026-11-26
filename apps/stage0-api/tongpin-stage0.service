@@ -1,0 +1,19 @@
+[Unit]
+Description=Tongpin Stage0 Data Collector
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/srv/tongpin-data
+Environment=TP_DATA_DIR=/srv/tongpin-data
+Environment=TP_HOST=127.0.0.1
+Environment=TP_PORT=8766
+ExecStart=/usr/bin/python3 /srv/tongpin-data/server.py
+Restart=always
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

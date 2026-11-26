@@ -4,6 +4,7 @@ import { L1_QUESTIONS, L2_QUESTIONS } from '../config/questions.js';
 import { computeResult } from './score.js';
 import { computeCulture } from './bazi.js';
 import { pickAnimal } from '../config/animals.js';
+import { track, trackProfile, submitReserve } from './track.js';
 
 const ALL = [...L1_QUESTIONS, ...L2_QUESTIONS];
 const $ = (s) => document.querySelector(s);
@@ -32,8 +33,9 @@ function renderGate() {
       <button class="btn btn-primary" id="ageYes">${COPY.ageGate.yes}</button>
       <button class="btn btn-line" id="ageNo">${COPY.ageGate.no}</button>
     </div>`;
-  $('#ageYes').onclick = () => { state.ageOk = true; renderConsent(); };
-  $('#ageNo').onclick = () => toast(COPY.ageGate.reject);
+  track('visit');
+  $('#ageYes').onclick = () => { state.ageOk = true; track('gate_pass'); renderConsent(); };
+  $('#ageNo').onclick = () => { track('gate_reject'); toast(COPY.ageGate.reject); };
 }
 
 function renderConsent() {
@@ -46,7 +48,7 @@ function renderConsent() {
       <pre class="disclaimer">${COPY.disclaimer}</pre>
       <button class="btn btn-primary" id="consentYes">${COPY.consent.agree}</button>
     </div>`;
-  $('#consentYes').onclick = () => { state.consentOk = true; renderBirth(); };
+  $('#consentYes').onclick = () => { state.consentOk = true; track('consent_agree'); renderBirth(); };
 }
 
 function renderBirth() {
@@ -68,6 +70,8 @@ function renderBirth() {
     const date = $('#birthDate').value;
     if (!date) return toast(COPY.errors.needDate);
     state.birth = { date, time: $('#birthTime').value, gender: $('#birthGender').value, timeSkipped: !$('#birthTime').value };
+    // 只记录"是否跳过时辰"这一布尔值，绝不上传日期/时辰本身
+    track('birth_submit', { step: state.birth.timeSkipped ? 'no_time' : 'with_time' });
     state.index = 0;
     renderQuestion();
   };
@@ -102,11 +106,12 @@ function renderQuestion() {
   document.querySelectorAll('.opt').forEach((b) => {
     b.onclick = () => {
       state.answers[q.id] = Number(b.dataset.v);
+      track('q_answer', { index: i + 1, total: ALL.length, qid: q.id, value: Number(b.dataset.v) });
       document.querySelectorAll('.opt').forEach((x) => x.classList.remove('selected'));
       b.classList.add('selected');
     };
   });
-  if ($('#prev')) $('#prev').onclick = () => { state.index--; renderQuestion(); };
+  if ($('#prev')) $('#prev').onclick = () => { state.index--; track('q_back'); renderQuestion(); };
   $('#next').onclick = () => {
     if (!state.answers[q.id]) return toast(COPY.errors.needAll);
     if (i === ALL.length - 1) return renderResult();
@@ -121,6 +126,9 @@ function renderResult() {
   const culture = computeCulture({ ...state.birth, Lunar: window.Lunar });
   const animal = pickAnimal(r.resonance);
   state.result = { ...r, culture, animal };
+  track('result_view', { resonance: r.resonance, animal: animal.name });
+  // 只上报可验证的风格维度，不上传生辰；八字层不入画像库
+  trackProfile(r.resonance, r.styles, r.careItems.map((c) => c.title), animal.name);
   const cultureHtml = culture.timeSkipped
     ? `<p class="notice">${culture.note}</p><p>${culture.text}</p>`
     : `<p>${culture.text}</p>`;
@@ -158,15 +166,19 @@ function renderResult() {
       <button class="btn btn-line" id="again">${COPY.result.again}</button>
     </div>`;
 
-  $('#share').onclick = renderShare;
-  $('#again').onclick = renderGate;
+  $('#share').onclick = () => { track('share_click'); renderShare(); };
+  $('#again').onclick = () => { track('again'); renderGate(); };
   $('#reserve').onclick = () => {
     const v = $('#phone').value.trim();
     if (!/^1\d{10}$/.test(v)) return toast(COPY.errors.badPhone);
     $('#reserve').disabled = true;
     $('#reserve').textContent = COPY.result.reserveDone;
-    // 预约仅存本地演示；正式接入自有服务器需用户单独同意
-    try { localStorage.setItem('tp_stage0_reserve', v); } catch { /* 隐私模式下忽略 */ }
+    // 手机号经用户主动提交后入库，与匿名 ID 绑定，供后续注册匹配
+    submitReserve(v, (ok) => {
+      if (!ok) { $('#reserve').disabled = false; $('#reserve').textContent = COPY.result.reserve; toast('提交失败，请重试'); return; }
+      track('reserve_submit');
+      try { localStorage.setItem('tp_s0_reserved', '1'); } catch { /* 隐私模式忽略 */ }
+    });
   };
 }
 
