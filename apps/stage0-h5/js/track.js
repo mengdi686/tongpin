@@ -35,6 +35,31 @@ export function trackProfile(resonance, styles, careTop, animal) {
   post('profile', { resonance, styles, careTop, animal });
 }
 
+export function trackResult(answers, resonance, styles, careTop, animal) {
+  post('result', { answers, resonance, styles, careTop, animal });
+}
+
+export function trackBirth(birthInfo, culture, onDone) {
+  // 生辰经 HTTPS 传服务端加密落库；consent 为用户单独勾选取证
+  fetch(API + 'birth', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      vid: getVid(), consent: true,
+      date: birthInfo.date, time: birthInfo.time, gender: birthInfo.gender,
+      dayMaster: culture.dayMaster, elements: culture.counts, zodiac: culture.zodiac,
+    }),
+  }).then((r) => r.ok).then((ok) => onDone && onDone(ok)).catch(() => onDone && onDone(false));
+}
+
+export function requestBackfill(onData) {
+  fetch(API + 'backfill', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ vid: getVid() }),
+  }).then((r) => r.json()).then(onData).catch(() => {});
+}
+
 export function submitReserve(phone, onDone) {
   try {
     fetch(API + 'reserve', {

@@ -36,8 +36,12 @@
 | `events` | id, vid, type, payload, ts | 行为漏斗 | 低（不含生辰） |
 | `profiles` | vid, resonance, styles, care_top, animal, ts | 风格画像 | 中（可验证维度） |
 | `reservations` | id, vid, phone, created_at, linked_at | 内测预约 | **高（手机号）** |
+| `births` | vid, date_enc, time_enc, gender, day_master, elements, zodiac, consent_at | 生辰与派生结果 | **高（敏感，加密）** |
+| `result_snapshots` | vid, answers, resonance, styles, care_top, animal, rules_version, ts | 可复现结果 | 中 |
+| `face_checks` | id, vid, risk_score, verdict, ts | 图片检测结果 | 中（**无原图**） |
 
-**绝不入表/入日志**：生日、出生时辰、身份证号、人脸、精确地理位置。
+**绝不入表/入日志**：身份证号、人脸原图、精确地理位置。
+生辰时辰**加密后**入 `births` 表；派生结果（日主/五行/生肖）明文，用于后续匹配。
 `payload` 经过白名单过滤，只允许 `index/total/qid/value/resonance/animal/step`。
 
 ---
@@ -62,16 +66,24 @@
 3. **阶段 1/2 用户注册时**：前端读取同一个 `vid`，调用 `POST /api/link`（vid + phone），
    把该手机号的历史行为、画像、预约记录一次性归并到正式用户。
 4. 因此：**先测后注册的用户，历史数据不丢**；这是阶段 0 必须先埋点再放量的根本原因。
+5. **生辰后补匹配**：用户阶段 0 跳过生辰、后续注册补填时，凭同一 `vid` 取回 `result_snapshots.answers`，
+   按 `rules_version` 对应规则重新计算 L1/L2 风格分与占比，再叠加 `births` 的派生结果（日主/五行/生肖）。
+   用户真正要的是**可匹配的衍生结论**，不是生日数字本身；故快照必须存原始答案与规则版本。
+6. **人脸合规**：图片审核只写 `face_checks`（风险分 + 结论 + 时间），原图即时丢弃、不上传留存、不建人脸库。
+   若未来启用需单独同意 + 事前个人信息保护影响评估（报告保存 3 年），并遵守《人脸识别技术应用安全管理办法》第 8 条。
 
 隐私约束：手机号仅在用户主动提交预约时收集，用于内测邀请，不用于其他营销；
-用户注销时按 `vid` 与 `phone` 删除 `reservations`、`profiles`、`events`、`visitors` 对应行。
+用户注销时按 `vid` 与 `phone` 删除全部相关行，包括 `births` 与 `face_checks`；
+生辰的单独同意与删除请求走同一 vid 通道，删除后派生结果一并清除。
 
 ---
 
 ## 5. 留存与备份
 
 - 行为事件（`events`）：保留 **180 天**，到期脚本清理。
-- 画像（`profiles`）：保留至用户注销或阶段 2 账号归并后转为正式用户数据。
+- 画像与结果快照（`profiles`、`result_snapshots`）：保留至用户注销或阶段 2 账号归并后转为正式用户数据。
+- 生辰（`births`）：加密保存至用户注销或账号归并；用户可随时单独删除。
+- 图片检测（`face_checks`）：只存结论，保留 90 天；原图从不落库。
 - 预约（`reservations`）：内测结束后 30 天清理未关联的手机号。
 - 备份：`stage0.db` 每日一次，保留 7 份，存放 `/srv/tongpin-data/backups/`，不同机同步另议。
 

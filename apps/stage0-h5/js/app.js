@@ -4,7 +4,7 @@ import { L1_QUESTIONS, L2_QUESTIONS } from '../config/questions.js';
 import { computeResult } from './score.js';
 import { computeCulture } from './bazi.js';
 import { pickAnimal } from '../config/animals.js';
-import { track, trackProfile, submitReserve } from './track.js';
+import { track, trackProfile, trackResult, trackBirth, submitReserve } from './track.js';
 
 const ALL = [...L1_QUESTIONS, ...L2_QUESTIONS];
 const $ = (s) => document.querySelector(s);
@@ -64,12 +64,14 @@ function renderBirth() {
         <div class="field"><label>${COPY.birth.timeLabel}</label><select id="birthTime"><option value="">${COPY.birth.timeSkip}</option>${hours}</select></div>
         <div class="field"><label>${COPY.birth.genderLabel}</label><select id="birthGender"><option value="f">${COPY.birth.female}</option><option value="m">${COPY.birth.male}</option></select></div>
       </div>
+      <label class="consent-check"><input type="checkbox" id="birthConsent"><span>${COPY.birth.separateConsent}</span></label>
       <button class="btn btn-primary" id="birthNext">${COPY.birth.next}</button>
     </div>`;
   $('#birthNext').onclick = () => {
     const date = $('#birthDate').value;
     if (!date) return toast(COPY.errors.needDate);
-    state.birth = { date, time: $('#birthTime').value, gender: $('#birthGender').value, timeSkipped: !$('#birthTime').value };
+    const consented = !!$('#birthConsent').checked;
+    state.birth = { date, time: $('#birthTime').value, gender: $('#birthGender').value, timeSkipped: !$('#birthTime').value, consented };
     // 只记录"是否跳过时辰"这一布尔值，绝不上传日期/时辰本身
     track('birth_submit', { step: state.birth.timeSkipped ? 'no_time' : 'with_time' });
     state.index = 0;
@@ -127,8 +129,13 @@ function renderResult() {
   const animal = pickAnimal(r.resonance);
   state.result = { ...r, culture, animal };
   track('result_view', { resonance: r.resonance, animal: animal.name });
-  // 只上报可验证的风格维度，不上传生辰；八字层不入画像库
+  // 留存原始答案与结果快照，供后续补填生辰时按同一规则版本复现
+  trackResult(state.answers, r.resonance, r.styles, r.careItems.map((c) => c.title), animal.name);
   trackProfile(r.resonance, r.styles, r.careItems.map((c) => c.title), animal.name);
+  // 生辰单独同意后加密落库（文化用途，不进排序）；跳过时不上报
+  if (!state.birth.timeSkipped && culture.available && state.birth.consented) {
+    trackBirth(state.birth, culture);
+  }
   const cultureHtml = culture.timeSkipped
     ? `<p class="notice">${culture.note}</p><p>${culture.text}</p>`
     : `<p>${culture.text}</p>`;

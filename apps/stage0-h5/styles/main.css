@@ -44,6 +44,8 @@ p { font-size: 14px; line-height: 1.7; color: var(--muted); margin: 8px 0; }
 .row { display: flex; gap: 10px; }
 .row > * { flex: 1; }
 
+.consent-check { display: flex; gap: 8px; align-items: flex-start; margin: 14px 0; font-size: 12px; line-height: 1.6; color: var(--text-soft); }
+.consent-check input { margin-top: 3px; accent-color: var(--brand-pink); flex-shrink: 0; }
 .consent-list { padding-left: 18px; font-size: 13px; line-height: 1.8; color: var(--muted); }
 
 .progress-wrap { margin: 18px 0 8px; }
