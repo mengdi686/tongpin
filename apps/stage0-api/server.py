@@ -26,7 +26,7 @@ ALLOWED_ORIGINS = {
 ALLOWED_EVENTS = {
     "visit", "gate_pass", "gate_reject", "consent_agree",
     "birth_submit", "q_answer", "q_back", "result_view",
-    "share_click", "reserve_submit", "again",
+    "share_click", "share_copy", "ref_in", "reserve_submit", "again",
 }
 
 

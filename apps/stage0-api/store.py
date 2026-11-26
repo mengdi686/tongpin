@@ -95,7 +95,7 @@ def clean_payload(raw):
     if not isinstance(raw, dict):
         return {}
     safe = {}
-    for k in ("index", "total", "qid", "value", "resonance", "animal", "step"):
+    for k in ("index", "total", "qid", "value", "resonance", "animal", "step", "ref"):
         if k in raw:
             v = raw[k]
             if isinstance(v, (int, float, str, bool)) and len(str(v)) < 80:

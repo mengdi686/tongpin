@@ -5,6 +5,7 @@ import { computeResult } from './score.js';
 import { computeCulture } from './bazi.js';
 import { pickAnimal } from '../config/animals.js';
 import { track, trackProfile, trackResult, trackBirth, submitReserve } from './track.js';
+import { renderShare, copyShare } from './share.js';
 
 const ALL = [...L1_QUESTIONS, ...L2_QUESTIONS];
 const $ = (s) => document.querySelector(s);
@@ -167,13 +168,19 @@ function renderResult() {
       ${cultureHtml}
       ${extendedHtml}
       <pre class="disclaimer">${COPY.disclaimer}</pre>
+      <div class="share-preview" id="shareHook"></div>
       <button class="btn btn-primary" id="share">${COPY.result.share}</button>
+      <button class="btn btn-line" id="shareCopy">${COPY.result.shareCopy}</button>
       <div class="field" style="margin-top:18px"><input id="phone" placeholder="${COPY.result.reservePlaceholder}" inputmode="numeric" maxlength="11"></div>
       <button class="btn btn-line" id="reserve">${COPY.result.reserve}</button>
       <button class="btn btn-line" id="again">${COPY.result.again}</button>
     </div>`;
 
-  $('#share').onclick = () => { track('share_click'); renderShare(); };
+  $('#share').onclick = () => { track('share_click'); const hook = renderShare(state.result, toast); $('#shareHook').textContent = hook; };
+  $('#shareCopy').onclick = async () => {
+    const ok = await copyShare(state.result);
+    toast(ok ? COPY.result.shareCopied : COPY.result.shareFailed);
+  };
   $('#again').onclick = () => { track('again'); renderGate(); };
   $('#reserve').onclick = () => {
     const v = $('#phone').value.trim();
@@ -189,60 +196,12 @@ function renderResult() {
   };
 }
 
-function drawShareCanvas(r) {
-  const canvas = document.createElement('canvas');
-  canvas.width = 640; canvas.height = 1080;
-  const ctx = canvas.getContext('2d');
-  ctx.fillStyle = '#fff5f8'; ctx.fillRect(0, 0, 640, 1080);
-  ctx.fillStyle = '#ff4d8d'; ctx.fillRect(0, 0, 640, 12);
-  ctx.fillStyle = '#221c23'; ctx.font = '500 40px sans-serif';
-  ctx.fillText(COPY.brand + ' · ' + COPY.slogan, 48, 100);
-  ctx.font = '500 30px sans-serif';
-  r.styles.forEach((s, i) => ctx.fillText('· ' + s, 48, 180 + i * 52));
-  ctx.fillStyle = '#e63a77'; ctx.font = '500 46px sans-serif';
-  ctx.fillText(`约 ${r.resonance}% 的人与你同频`, 48, 420);
-  ctx.fillStyle = '#948b93'; ctx.font = '21px sans-serif';
-  ctx.fillText(COPY.result.scoreNote, 48, 466);
-  // 动物图区域：圆形玫粉底 + 本地 SVG，加载失败时退化为文字名
-  const cx = 480, cy = 610;
-  ctx.fillStyle = '#ffd9e6';
-  ctx.beginPath(); ctx.arc(cx, cy, 110, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = '#221c23'; ctx.font = '500 26px sans-serif';
-  ctx.fillText(r.animal ? `${r.animal.name}：${r.animal.line}` : '', 48, 600);
-  ctx.fillStyle = '#948b93'; ctx.font = '19px sans-serif';
-  ctx.fillText(COPY.result.animalNote, 48, 640);
-  ctx.fillStyle = '#221c23'; ctx.font = '26px sans-serif';
-  ctx.fillText(r.care[0] || '', 48, 790);
-  ctx.fillText(r.care[1] || '', 48, 834);
-  if (r.culture && r.culture.shareLine) {
-    ctx.fillStyle = '#e63a77'; ctx.font = '500 27px sans-serif';
-    ctx.fillText(r.culture.shareLine, 48, 920);
-  }
-  ctx.fillStyle = '#948b93'; ctx.font = '19px sans-serif';
-  COPY.disclaimer.split('\n').forEach((line, i) => ctx.fillText(line, 48, 980 + i * 30));
-  return { canvas, animal: r.animal, cx, cy };
+// 进入页面时记录分享来源 ref（朋友点开链接带来的新访客）
+function trackReferrer() {
+  try {
+    const ref = new URLSearchParams(location.search).get('ref');
+    if (ref && /^[A-Za-z0-9_-]{1,16}$/.test(ref)) track('ref_in', { ref });
+  } catch { /* 无 search 参数时忽略 */ }
 }
 
-function renderShare() {
-  const r = state.result;
-  const { canvas, animal, cx, cy } = drawShareCanvas(r);
-  canvas.className = 'share-canvas';
-  const old = $('.share-canvas');
-  if (old) old.remove();
-  $('#app .card').appendChild(canvas);
-  // SVG 到本地 Image，onload 后画入圆形区域；file:// 下 drawImage 可能污染画布，
-  // 但本页不读取像素、只供长按保存，故不调用 toDataURL，失败时保留文字降级。
-  if (animal) {
-    const img = new Image();
-    img.onload = () => {
-      const ctx = canvas.getContext('2d');
-      const size = 180;
-      ctx.drawImage(img, cx - size / 2, cy - size / 2, size, size);
-    };
-    img.onerror = () => { /* 图片加载失败时保留文字降级，不影响分享图主体 */ };
-    img.src = ASSET_BASE + animal.file;
-  }
-  toast('长按图片保存分享');
-}
-
-window.addEventListener('DOMContentLoaded', renderGate);
+window.addEventListener('DOMContentLoaded', () => { trackReferrer(); renderGate(); });
