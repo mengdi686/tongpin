@@ -1,0 +1,32 @@
+<view class="page">
+
+  <view class="progress-row">
+    <text class="progress-label">第 {{index + 1}} / {{total}} 题</text>
+    <text class="progress-section">{{sectionTitle}}</text>
+  </view>
+  <view class="progress-bar"><view class="progress-fill" style="width:{{percent}}%"></view></view>
+
+  <view class="card question-card">
+    <view class="q-text">{{question.text}}</view>
+    <view class="options">
+      <view
+        class="option {{answer === item.value ? 'option-active' : ''}}"
+        wx:for="{{options}}"
+        wx:key="value"
+        data-value="{{item.value}}"
+        bindtap="onChoose"
+      >
+        <text class="option-dot"></text>
+        <text class="option-label">{{item.label}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="nav-row">
+    <button class="btn btn-line" wx:if="{{index > 0}}" bindtap="onBack">上一题</button>
+    <button class="btn btn-primary" wx:if="{{answer}}" bindtap="onNext">{{isLast ? '查看结果' : '下一题'}}</button>
+  </view>
+
+  <view class="sub-hint">{{sectionSub}}</view>
+
+</view>

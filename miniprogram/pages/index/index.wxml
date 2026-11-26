@@ -1,0 +1,33 @@
+<view class="page">
+
+  <!-- 年龄门 -->
+  <view class="gate" wx:if="{{step === 'gate'}}">
+    <view class="brand">{{copy.brand}}</view>
+    <view class="slogan">{{copy.slogan}}</view>
+    <view class="card gate-card">
+      <view class="gate-title">{{copy.ageGate.title}}</view>
+      <button class="btn btn-primary" bindtap="onAdult">是，我已成年</button>
+      <button class="btn btn-line" bindtap="onMinor">未满 18 周岁</button>
+    </view>
+  </view>
+
+  <!-- 未成年拒绝 -->
+  <view class="gate" wx:elif="{{step === 'reject'}}">
+    <view class="card">
+      <view class="gate-title">{{copy.ageGate.reject}}</view>
+    </view>
+  </view>
+
+  <!-- 知情同意 -->
+  <view class="gate" wx:elif="{{step === 'consent'}}">
+    <view class="brand">{{copy.brand}}</view>
+    <view class="lead">{{copy.lead}}</view>
+    <view class="card consent-card">
+      <view class="consent-title">{{copy.consent.title}}</view>
+      <view class="consent-item" wx:for="{{copy.consent.items}}" wx:key="*this">{{index + 1}}. {{item}}</view>
+      <button class="btn btn-primary" bindtap="onStart">{{copy.consent.agree}}</button>
+    </view>
+    <view class="disclaimer">{{copy.disclaimer}}</view>
+  </view>
+
+</view>

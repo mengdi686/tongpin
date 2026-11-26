@@ -21,6 +21,13 @@ const REQUIRED = [
   'app/match.html',
   'app/match.css',
   'app/match.js',
+  // 阶段1 小程序工程
+  'miniprogram/app.json',
+  'miniprogram/app.js',
+  'miniprogram/pages/index/index.wxml',
+  'miniprogram/pages/quiz/quiz.wxml',
+  'miniprogram/pages/result/result.wxml',
+  'scripts/stage1-miniprogram-test.mjs',
 ];
 
 // 注册/向导/资料卡等由 JS 动态生成的 id，允许不在静态 HTML 中
@@ -77,6 +84,24 @@ if (has(htmlRel)) {
       }
     }
   }
+}
+
+// 4b. 小程序 JSON 合法性 + 页面三件套
+for (const rel of ['miniprogram/app.json', 'miniprogram/project.config.json', 'miniprogram/sitemap.json',
+  'miniprogram/pages/index/index.json', 'miniprogram/pages/quiz/quiz.json', 'miniprogram/pages/result/result.json']) {
+  if (!has(rel)) continue;
+  try { JSON.parse(fs.readFileSync(p(rel), 'utf8')); }
+  catch (e) { errors.push(`小程序 JSON 非法：${rel}（${e.message}）`); }
+}
+if (has('miniprogram/app.json')) {
+  const appJson = JSON.parse(fs.readFileSync(p('miniprogram/app.json'), 'utf8'));
+  if (!appJson.pages || !appJson.pages.length) errors.push('小程序 app.json.pages 为空');
+  for (const page of appJson.pages || []) {
+    for (const ext of ['.wxml', '.js', '.wxss']) {
+      if (!has(`miniprogram/${page}${ext}`)) errors.push(`小程序页面缺少 ${page}${ext}`);
+    }
+  }
+  if (appJson.lazyCodeLoading !== 'requiredComponents') errors.push('小程序缺少 lazyCodeLoading: requiredComponents');
 }
 
 // 5. 文档内 file:/// 链接是否有效

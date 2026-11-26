@@ -1,0 +1,74 @@
+<view class="page" wx:if="{{result}}">
+
+  <view class="hero">
+    <view class="hero-title">{{copy.result.title}}</view>
+    <view class="score-block">
+      <text class="score-label">{{copy.result.scoreLabel}}</text>
+      <text class="score-value">{{result.resonance}}{{copy.result.scoreUnit}}</text>
+    </view>
+    <view class="score-note">{{copy.result.scoreNote}}</view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">{{copy.result.styleTitle}}</view>
+    <view class="style-tags">
+      <text class="style-tag" wx:for="{{result.styles}}" wx:key="*this">{{item}}</text>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">{{copy.result.careTitle}}</view>
+    <view class="care-sub">{{copy.result.careSub}}</view>
+    <view class="care-item" wx:for="{{result.careItems}}" wx:key="dim">
+      <view class="care-head">
+        <text class="care-rank">{{index + 1}}</text>
+        <text class="care-title">{{item.title}}</text>
+      </view>
+      <view class="care-text">{{item.text}}</view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">{{copy.result.adviceTitle}}</view>
+    <view class="advice">{{result.advice}}</view>
+  </view>
+
+  <view class="card animal-card">
+    <view class="section-title">{{copy.result.animalTitle}}</view>
+    <view class="animal-name">{{animal.name}}</view>
+    <view class="animal-line">{{animal.line}}</view>
+    <view class="animal-note">{{copy.result.animalNote}}</view>
+  </view>
+
+  <view class="card share-card">
+    <view class="section-title">{{copy.result.shareTitle}}</view>
+    <view class="hook">{{hook}}</view>
+    <button class="btn btn-primary" bindtap="onCopy">{{copy.result.shareCopy}}</button>
+    <button class="btn btn-line" open-type="share">转发给朋友</button>
+  </view>
+
+  <view class="card reserve-card">
+    <view class="section-title">{{copy.result.reserve}}</view>
+    <block wx:if="{{!reserved}}">
+      <input
+        class="phone-input"
+        placeholder="{{copy.result.reservePlaceholder}}"
+        type="number"
+        maxlength="11"
+        value="{{phone}}"
+        bindinput="onPhone"
+      />
+      <view class="reserve-agree" bindtap="onToggleAgree">
+        <text class="checkbox {{agreed ? 'checked' : ''}}">{{agreed ? '✓' : ''}}</text>
+        <text class="agree-text">{{copy.result.reserveAgree}}</text>
+      </view>
+      <button class="btn btn-primary" bindtap="onReserve">提交预约</button>
+    </block>
+    <view class="reserve-done" wx:else>{{copy.result.reserveDone}}</view>
+  </view>
+
+  <button class="btn btn-line again" bindtap="onAgain">{{copy.result.again}}</button>
+
+  <view class="disclaimer">{{copy.disclaimer}}</view>
+
+</view>
