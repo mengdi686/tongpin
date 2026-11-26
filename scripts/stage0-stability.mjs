@@ -2,6 +2,7 @@
 // 用法：node scripts/stage0-stability.mjs
 // 契约见 docs/07-stage0-assessment.md 第 7 节
 import path from 'node:path';
+import fs from 'node:fs';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -11,8 +12,11 @@ const Lunar = (await import(pathToFileURL(vendor).href)).default.Lunar;
 const { computeResult, computeResonance } = await import(pathToFileURL(path.join(root, 'apps/stage0-h5/js/score.js')).href);
 const { computeCulture } = await import(pathToFileURL(path.join(root, 'apps/stage0-h5/js/bazi.js')).href);
 const { COPY } = await import(pathToFileURL(path.join(root, 'apps/stage0-h5/config/copy.js')).href);
+const { pickAnimal, bandFor, ANIMALS, ANIMAL_BANDS } = await import(pathToFileURL(path.join(root, 'apps/stage0-h5/config/animals.js')).href);
 
-const BANNED = ['算命', '测算', '预测', '命中注定', '正缘预测', '天作之合', '克夫', '克妻', '化解', '改运', '转运', '保证脱单', '准确率', '必然', '注定', '诊断', '治疗'];
+const BANNED = ['算命', '测算', '预测', '命中注定', '正缘预测', '天作之合', '克夫', '克妻', '化解', '改运', '转运', '保证脱单', '准确率', '一定', '必然', '注定', '诊断', '治疗', '心理疾病'];
+// 文化彩蛋延伸段不得出现配对断言
+const PAIRING_CLAIMS = ['另一半属', '更适合你', '对你更好', '相配', '相克', '最佳配对', '命定'];
 const CASES = [
   { date: '1990-05-15', time: '10:00', skipped: false },
   { date: '1990-05-15', time: '23:30', skipped: false },
@@ -84,9 +88,23 @@ for (let ci = 0; ci < CASES.length; ci++) {
       if (!item.text || item.text.length < 12) errors.push(`${c.date} 第${n}次「${item.dim}」缺少具体描述`);
     }
 
-    // 文化名片确定性，且不得泄露生辰
-    if (culture.shareLine !== baseline.shareLine) errors.push(`${c.date} 第${n}次文化名片漂移`);
-    if (culture.shareLine && /\d{4}[-/年]/.test(culture.shareLine)) errors.push(`${c.date} 第${n}次文化名片含生辰`);
+    // 文化彩蛋确定性、五行延伸段存在、不得泄露生辰或出现配对断言
+    if (culture.shareLine !== baseline.shareLine) errors.push(`${c.date} 第${n}次文化短句漂移`);
+    if (culture.shareLine && /\d{4}[-/年]/.test(culture.shareLine)) errors.push(`${c.date} 第${n}次文化短句含生辰`);
+    if (!culture.extended || !culture.extended.includes('五行')) errors.push(`${c.date} 第${n}次五行延伸段缺失`);
+    if (culture.extended && culture.extended !== baseline.extended) errors.push(`${c.date} 第${n}次五行延伸段漂移`);
+    for (const claim of PAIRING_CLAIMS) {
+      if (culture.extended && culture.extended.includes(claim)) errors.push(`${c.date} 第${n}次五行延伸段命中配对断言「${claim}」`);
+    }
+
+    // 同频小动物：落在占比对应分数段，素材文件存在
+    const animal = pickAnimal(r.resonance, () => 0.999999);
+    const band = bandFor(r.resonance);
+    if (!band.ids.includes(animal.id)) errors.push(`${c.date} 第${n}次动物 ${animal.id} 不属于 ${r.resonance}% 对应分数段`);
+    if (!ANIMALS[animal.id]) errors.push(`${c.date} 第${n}次动物 ${animal.id} 无配置`);
+    const asset = path.join(root, 'apps/stage0-h5/assets/animals', animal.file);
+    if (!fs.existsSync(asset)) errors.push(`${c.date} 第${n}次动物素材缺失：${animal.file}`);
+    if (animal.line && PAIRING_CLAIMS.some((claim) => animal.line.includes(claim))) errors.push(`${c.date} 第${n}次动物文案命中配对断言`);
 
     // 缺时辰降级
     if (c.skipped && !culture.note) errors.push(`${c.date} 缺时辰未标注信息不足`);
@@ -95,8 +113,8 @@ for (let ci = 0; ci < CASES.length; ci++) {
     // 禁用词检查覆盖结果卡全部可见文案
     const text = [
       r.styles.join(''), r.care.join(''), r.careItems.map((x) => x.text).join(''),
-      r.advice, COPY.result.scoreNote, COPY.result.scoreFootnote,
-      culture.text, culture.shareLine, culture.note,
+      r.advice, COPY.result.scoreNote, COPY.result.scoreFootnote, COPY.result.animalNote,
+      culture.text, culture.extended, culture.shareLine, culture.note, animal.line,
     ].join('');
     for (const w of BANNED) {
       if (text.includes(w)) errors.push(`${c.date} 第${n}次命中禁用词「${w}」`);
@@ -111,4 +129,4 @@ if (errors.length) {
   for (const e of [...new Set(errors)].slice(0, 30)) console.log(`  - ${e}`);
   process.exit(1);
 }
-console.log('\nPASS：四柱确定性 / 同频占比一致 / 5点量表归一 / 关系层4条 / 文化名片稳定 / 缺时辰降级 / 禁用词零命中');
+console.log('\nPASS：四柱确定性 / 同频占比一致 / 5点量表归一 / 关系层4条 / 文化彩蛋无配对断言 / 动物段位与素材 / 缺时辰降级 / 禁用词零命中');

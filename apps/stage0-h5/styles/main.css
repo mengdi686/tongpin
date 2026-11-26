@@ -68,14 +68,22 @@ p { font-size: 14px; line-height: 1.7; color: var(--muted); margin: 8px 0; }
 .nav { display: flex; gap: 10px; margin-top: 18px; }
 .nav .btn { margin-top: 0; }
 
+.score-hero { display: flex; align-items: center; gap: 14px; margin: 8px 0 4px; }
 .score-ring {
-  width: 130px; height: 130px; border-radius: 50%; margin: 8px auto;
+  width: 124px; height: 124px; border-radius: 50%; flex: 0 0 124px;
   background: var(--brand-grad); display: flex; align-items: center; justify-content: center;
   flex-direction: column; color: #fff;
 }
-.score-ring b { font-size: 38px; font-weight: 500; line-height: 1; }
+.score-ring b { font-size: 36px; font-weight: 500; line-height: 1; }
 .score-ring small { font-size: 11px; opacity: .9; margin-top: 6px; }
-.score-note { text-align: center; font-size: 11px; color: var(--brand-pink-deep); margin: 10px 0 20px; }
+.animal-box {
+  flex: 1; min-width: 0; background: var(--brand-pink-soft); border-radius: 16px;
+  padding: 10px 12px; display: flex; flex-direction: column; align-items: center; text-align: center;
+}
+.animal-img { width: 76px; height: 76px; object-fit: contain; }
+.animal-name { font-size: 14px; font-weight: 500; color: var(--brand-pink-deep); margin-top: 2px; }
+.animal-line { font-size: 11px; line-height: 1.5; color: var(--muted); margin-top: 4px; }
+.score-note { text-align: center; font-size: 11px; color: var(--brand-pink-deep); margin: 10px 0 6px; }
 
 .tags { display: flex; flex-wrap: wrap; gap: 8px; }
 .tag { padding: 7px 14px; background: var(--brand-pink-soft); color: var(--brand-pink-deep); border-radius: var(--radius-pill); font-size: 13px; }
@@ -88,7 +96,9 @@ p { font-size: 14px; line-height: 1.7; color: var(--muted); margin: 8px 0; }
 .sub { font-size: 12px; color: var(--muted); margin: 0 0 10px; }
 .list-item b { display: block; font-size: 14px; font-weight: 500; color: var(--ink); }
 .list-item span { display: block; font-size: 13px; line-height: 1.6; color: var(--muted); margin-top: 3px; }
-.culture-card { background: var(--brand-pink-soft); border-radius: 14px; padding: 14px; margin: 14px 0; }
-.culture-line { font-size: 15px; line-height: 1.6; color: var(--brand-pink-deep); margin: 0; }
-.culture-card .btn { margin-top: 12px; }
+.culture-extended {
+  background: var(--brand-pink-soft); border-left: 3px solid var(--brand-pink);
+  border-radius: 0 12px 12px 0; padding: 12px 14px; margin: 12px 0;
+  font-size: 13px; line-height: 1.75; color: var(--brand-pink-deep);
+}
 .share-canvas { width: 100%; max-width: 320px; display: block; margin: 16px auto 0; border-radius: 16px; }
