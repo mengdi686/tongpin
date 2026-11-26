@@ -76,12 +76,13 @@ function renderQuestion() {
   const i = state.index;
   const q = ALL[i];
   const isL1 = i < L1_QUESTIONS.length;
-  const scale = isL1 ? COPY.scale.l1 : COPY.scale.l2;
+  // L1 与 L2 统一 5 点量表，缩短作答路径
+  const scale = COPY.scale.all;
   const sectionTitle = isL1 ? COPY.section.l1 : COPY.section.l2;
   const sectionSub = isL1 ? COPY.section.l1sub : COPY.section.l2sub;
   const localIndex = isL1 ? i : i - L1_QUESTIONS.length;
   const total = isL1 ? L1_QUESTIONS.length : L2_QUESTIONS.length;
-  const opts = scale.map((label, n) => `<button class="opt ${state.answers[q.id] === n + 1 ? 'selected' : ''}" data-v="${n + 1}">${n + 1}. ${label}</button>`).join('');
+  const opts = scale.map((label, n) => `<button class="opt ${state.answers[q.id] === n + 1 ? 'selected' : ''}" data-v="${n + 1}"><span class="opt-dot">${n + 1}</span>${label}</button>`).join('');
 
   $('#app').innerHTML = `
     <div class="brand"><span class="brand-mark"></span>${COPY.brand}</div>
@@ -112,6 +113,33 @@ function renderQuestion() {
   };
 }
 
+function buildShareText(r) {
+  const lines = [
+    `${COPY.brand} · ${COPY.slogan}`,
+    `我的相处风格：${r.styles.join(' · ')}`,
+    `约 ${r.resonance}% 的人与我风格相近（仅供娱乐参考，不代表关系结果）`,
+  ];
+  if (r.culture && r.culture.shareLine) lines.push(`我的文化名片：${r.culture.shareLine}`);
+  return lines.join('\n');
+}
+
+async function copyShareText(r) {
+  const text = buildShareText(r);
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch { /* 浏览器不支持时静默 */ }
+    ta.remove();
+  }
+  toast(COPY.result.copied);
+}
+
 function renderResult() {
   state.stage = 'result';
   const r = computeResult(state.answers);
@@ -120,21 +148,27 @@ function renderResult() {
   const cultureHtml = culture.timeSkipped
     ? `<p class="notice">${culture.note}</p><p>${culture.text}</p>`
     : `<p>${culture.text}</p>`;
+  const cultureCard = culture.shareLine
+    ? `<div class="culture-card"><div class="culture-line">${culture.shareLine}</div><button class="btn btn-line" id="copyCulture">${COPY.result.copyCulture}</button></div>`
+    : '';
 
   $('#app').innerHTML = `
     <div class="brand"><span class="brand-mark"></span>${COPY.brand}</div>
     <div class="card">
       <h2>${COPY.result.title}</h2>
-      <div class="score-ring"><b>${r.score}%</b><small>${COPY.result.scoreLabel}</small></div>
+      <div class="score-ring"><b>${r.resonance}%</b><small>${COPY.result.scoreLabel}</small></div>
       <div class="score-note">${COPY.result.scoreNote}</div>
-      <h2>${COPY.result.styleTitle}</h2>
+      <p class="footnote">${COPY.result.scoreFootnote}</p>
+      <h2 style="margin-top:22px">${COPY.result.styleTitle}</h2>
       <div class="tags">${r.styles.map((s) => `<span class="tag">${s}</span>`).join('')}</div>
       <h2 style="margin-top:22px">${COPY.result.careTitle}</h2>
-      ${r.care.map((c) => `<div class="list-item">${c}</div>`).join('')}
+      <p class="sub">${COPY.result.careSub}</p>
+      ${r.careItems.map((c, i) => `<div class="list-item"><b>${i + 1}. ${c.title}</b><span>${c.text}</span></div>`).join('')}
       <h2 style="margin-top:22px">${COPY.result.adviceTitle}</h2>
       <p>${r.advice}</p>
       <h2 style="margin-top:22px">${COPY.result.cultureTitle}</h2>
       ${cultureHtml}
+      ${cultureCard}
       <pre class="disclaimer">${COPY.disclaimer}</pre>
       <button class="btn btn-primary" id="share">${COPY.result.share}</button>
       <div class="field" style="margin-top:18px"><input id="phone" placeholder="${COPY.result.reservePlaceholder}" inputmode="numeric" maxlength="11"></div>
@@ -144,6 +178,7 @@ function renderResult() {
 
   $('#share').onclick = renderShare;
   $('#again').onclick = renderGate;
+  if ($('#copyCulture')) $('#copyCulture').onclick = () => copyShareText(state.result);
   $('#reserve').onclick = () => {
     const v = $('#phone').value.trim();
     if (!/^1\d{10}$/.test(v)) return toast(COPY.errors.badPhone);
@@ -157,23 +192,30 @@ function renderResult() {
 function renderShare() {
   const r = state.result;
   const canvas = document.createElement('canvas');
-  canvas.width = 640; canvas.height = 900;
+  canvas.width = 640; canvas.height = 1000;
   const ctx = canvas.getContext('2d');
-  ctx.fillStyle = '#fff5f8'; ctx.fillRect(0, 0, 640, 900);
+  ctx.fillStyle = '#fff5f8'; ctx.fillRect(0, 0, 640, 1000);
   ctx.fillStyle = '#ff4d8d'; ctx.fillRect(0, 0, 640, 12);
   ctx.fillStyle = '#221c23'; ctx.font = '500 40px sans-serif';
   ctx.fillText(COPY.brand + ' · ' + COPY.slogan, 48, 100);
-  ctx.font = '500 32px sans-serif';
-  r.styles.forEach((s, i) => ctx.fillText('· ' + s, 48, 190 + i * 60));
-  ctx.fillStyle = '#e63a77'; ctx.font = '500 80px sans-serif';
-  ctx.fillText(r.score + '%', 48, 460);
-  ctx.fillStyle = '#948b93'; ctx.font = '22px sans-serif';
-  ctx.fillText(COPY.result.scoreNote, 48, 510);
+  ctx.font = '500 30px sans-serif';
+  r.styles.forEach((s, i) => ctx.fillText('· ' + s, 48, 180 + i * 52));
+  ctx.fillStyle = '#e63a77'; ctx.font = '500 46px sans-serif';
+  ctx.fillText(`约 ${r.resonance}% 的人与你同频`, 48, 420);
+  ctx.fillStyle = '#948b93'; ctx.font = '21px sans-serif';
+  ctx.fillText(COPY.result.scoreNote, 48, 466);
   ctx.fillStyle = '#221c23'; ctx.font = '26px sans-serif';
-  ctx.fillText(r.care[0] || '', 48, 610);
+  ctx.fillText(r.care[0] || '', 48, 550);
+  ctx.fillText(r.care[1] || '', 48, 594);
+  if (r.culture && r.culture.shareLine) {
+    ctx.fillStyle = '#e63a77'; ctx.font = '500 27px sans-serif';
+    ctx.fillText('我的文化名片', 48, 690);
+    ctx.fillStyle = '#221c23'; ctx.font = '25px sans-serif';
+    ctx.fillText(r.culture.shareLine, 48, 730);
+  }
   ctx.fillStyle = '#948b93'; ctx.font = '20px sans-serif';
   const lines = COPY.disclaimer.split('\n');
-  lines.forEach((line, i) => ctx.fillText(line, 48, 740 + i * 32));
+  lines.forEach((line, i) => ctx.fillText(line, 48, 830 + i * 32));
 
   canvas.className = 'share-canvas';
   const old = $('.share-canvas');
