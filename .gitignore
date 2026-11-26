@@ -9,3 +9,10 @@ unpackage/
 .trae/
 .trae-html-share-packages/
 .uploads/
+# 平台发布标记与本地记忆，非项目源码
+.wbapp_*.genie
+.workbuddy/
+# Python 编译缓存与本地导出的敏感数据
+__pycache__/
+*.pyc
+stage0-export*.csv

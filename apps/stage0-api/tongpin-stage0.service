@@ -9,6 +9,8 @@ WorkingDirectory=/srv/tongpin-data
 Environment=TP_DATA_DIR=/srv/tongpin-data
 Environment=TP_HOST=127.0.0.1
 Environment=TP_PORT=8766
+# 查看漏斗必须带 X-Stats-Token，值由部署时填入，勿提交真实令牌
+Environment=TP_STATS_TOKEN=CHANGE_ME_ON_SERVER
 ExecStart=/usr/bin/python3 /srv/tongpin-data/server.py
 Restart=always
 RestartSec=5

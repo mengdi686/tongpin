@@ -1,119 +1,33 @@
 #!/usr/bin/env python3
-"""同频 阶段0 数据采集服务。
+"""同频 阶段0 数据采集服务（HTTP 层）。
 
-零第三方业务依赖（加密用 cryptography，服务器已装）：
-数据全部落在独立目录 /srv/tongpin-data/，与其他项目隔离。
-生辰经 Fernet 加密落库；人脸只存结论不存原图；身份证一律不碰。
+数据落地见同目录 store.py。生辰加密、人脸只存结论、身份证一律不碰。
 """
-
 import json
 import os
 import re
-import sqlite3
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse
-from cryptography.fernet import Fernet
 
-DATA_DIR = os.environ.get("TP_DATA_DIR", "/srv/tongpin-data")
-DB_PATH = os.path.join(DATA_DIR, "stage0.db")
-KEY_PATH = os.path.join(DATA_DIR, ".fernet.key")
+from store import DATA_DIR, DB_PATH, db, init_db, touch, enc, clean_payload, delete_all
+
 HOST = os.environ.get("TP_HOST", "127.0.0.1")
 PORT = int(os.environ.get("TP_PORT", "8766"))
 RULES_VERSION = "2026-11-26.1"
 PHONE_RE = re.compile(r"^1\d{10}$")
+# stats 鉴权：未设置令牌一律拒绝（fail-closed），避免公网直读漏斗数据
+STATS_TOKEN = os.environ.get("TP_STATS_TOKEN", "")
+# 同源反代下浏览器不会预检；白名单仅用于将来前端独立域名时放行
+ALLOWED_ORIGINS = {
+    "https://stage0.tongpin.truthhare.com",
+    "https://www.truthhare.com",
+}
 ALLOWED_EVENTS = {
     "visit", "gate_pass", "gate_reject", "consent_agree",
     "birth_submit", "q_answer", "q_back", "result_view",
     "share_click", "reserve_submit", "again",
 }
-
-
-def cipher():
-    os.makedirs(DATA_DIR, exist_ok=True)
-    if not os.path.exists(KEY_PATH):
-        with open(KEY_PATH, "wb") as f:
-            f.write(Fernet.generate_key())
-        os.chmod(KEY_PATH, 0o600)
-    with open(KEY_PATH, "rb") as f:
-        return Fernet(f.read())
-
-
-CIPHER = cipher()
-
-
-def db():
-    conn = sqlite3.connect(DB_PATH, timeout=10)
-    conn.row_factory = sqlite3.Row
-    return conn
-
-
-def init_db():
-    os.makedirs(DATA_DIR, exist_ok=True)
-    with db() as c:
-        c.executescript("""
-        PRAGMA journal_mode=WAL;
-        CREATE TABLE IF NOT EXISTS visitors (
-            vid TEXT PRIMARY KEY, created_at INTEGER NOT NULL, last_seen INTEGER NOT NULL
-        );
-        CREATE TABLE IF NOT EXISTS events (
-            id INTEGER PRIMARY KEY AUTOINCREMENT, vid TEXT NOT NULL, type TEXT NOT NULL,
-            payload TEXT NOT NULL DEFAULT '{}', ts INTEGER NOT NULL
-        );
-        CREATE INDEX IF NOT EXISTS idx_events_vid ON events(vid);
-        CREATE INDEX IF NOT EXISTS idx_events_type ON events(type);
-        CREATE TABLE IF NOT EXISTS profiles (
-            vid TEXT PRIMARY KEY, resonance INTEGER NOT NULL, styles TEXT NOT NULL,
-            care_top TEXT NOT NULL, animal TEXT NOT NULL, ts INTEGER NOT NULL
-        );
-        CREATE TABLE IF NOT EXISTS reservations (
-            id INTEGER PRIMARY KEY AUTOINCREMENT, vid TEXT NOT NULL, phone TEXT UNIQUE NOT NULL,
-            created_at INTEGER NOT NULL, linked_at INTEGER
-        );
-        CREATE TABLE IF NOT EXISTS births (
-            vid TEXT PRIMARY KEY, date_enc TEXT, time_enc TEXT, gender TEXT,
-            day_master TEXT, elements TEXT, zodiac TEXT,
-            consent_at INTEGER, created_at INTEGER, updated_at INTEGER
-        );
-        CREATE TABLE IF NOT EXISTS result_snapshots (
-            vid TEXT NOT NULL, rules_version TEXT NOT NULL, answers TEXT NOT NULL,
-            resonance INTEGER, styles TEXT, care_top TEXT, animal TEXT, ts INTEGER,
-            PRIMARY KEY (vid, rules_version)
-        );
-        CREATE TABLE IF NOT EXISTS face_checks (
-            id INTEGER PRIMARY KEY AUTOINCREMENT, vid TEXT NOT NULL,
-            risk_score INTEGER NOT NULL, verdict TEXT NOT NULL, ts INTEGER NOT NULL
-        );
-        """)
-
-
-def touch(vid):
-    now = int(time.time())
-    with db() as c:
-        c.execute(
-            "INSERT INTO visitors(vid,created_at,last_seen) VALUES(?,?,?) "
-            "ON CONFLICT(vid) DO UPDATE SET last_seen=excluded.last_seen",
-            (vid, now, now))
-
-
-def enc(value):
-    return CIPHER.encrypt(str(value).encode()).decode() if value else None
-
-
-def dec(value):
-    return CIPHER.decrypt(value.encode()).decode() if value else None
-
-
-def clean_payload(raw):
-    if not isinstance(raw, dict):
-        return {}
-    safe = {}
-    for k in ("index", "total", "qid", "value", "resonance", "animal", "step"):
-        if k in raw:
-            v = raw[k]
-            if isinstance(v, (int, float, str, bool)) and len(str(v)) < 80:
-                safe[k] = v
-    return safe
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -127,8 +41,10 @@ class Handler(BaseHTTPRequestHandler):
         self.send_response(code)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        origin = self.headers.get("Origin", "")
+        if origin in ALLOWED_ORIGINS:
+            self.send_header("Access-Control-Allow-Origin", origin)
+            self.send_header("Vary", "Origin")
         self.end_headers()
         self.wfile.write(body)
 
@@ -142,13 +58,26 @@ class Handler(BaseHTTPRequestHandler):
             return {}
 
     def do_OPTIONS(self):
-        self._send(204, {})
+        origin = self.headers.get("Origin", "")
+        if origin in ALLOWED_ORIGINS:
+            self.send_response(204)
+            self.send_header("Access-Control-Allow-Origin", origin)
+            self.send_header("Access-Control-Allow-Headers", "Content-Type")
+            self.send_header("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
+            self.send_header("Access-Control-Max-Age", "600")
+            self.send_header("Content-Length", "0")
+        else:
+            self.send_response(403)
+            self.send_header("Content-Length", "0")
+        self.end_headers()
 
     def do_GET(self):
         path = urlparse(self.path).path
         if path == "/api/health":
             return self._send(200, {"ok": True, "ts": int(time.time())})
         if path == "/api/stats":
+            if not STATS_TOKEN or self.headers.get("X-Stats-Token") != STATS_TOKEN:
+                return self._send(403, {"error": "forbidden"})
             return self._stats()
         self._send(404, {"error": "not found"})
 
@@ -185,7 +114,6 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(200, {"ok": True})
 
         if path == "/api/result":
-            # 存原始答案与规则版本，供后续补填生辰时可复现
             answers = data.get("answers")
             if not isinstance(answers, dict) or len(answers) > 60:
                 return self._send(400, {"error": "bad answers"})
@@ -203,7 +131,6 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(200, {"ok": True, "rulesVersion": RULES_VERSION})
 
         if path == "/api/birth":
-            # 生辰加密落库；派生结果明文用于后续匹配；须带单独同意标记
             if not data.get("consent"):
                 return self._send(403, {"error": "consent required"})
             date_val = str(data.get("date", ""))[:20]
@@ -229,8 +156,11 @@ class Handler(BaseHTTPRequestHandler):
                 c.execute("DELETE FROM births WHERE vid=?", (vid,))
             return self._send(200, {"ok": True})
 
+        if path == "/api/delete":
+            delete_all(vid)
+            return self._send(200, {"ok": True})
+
         if path == "/api/backfill":
-            # 后补匹配：取回原始答案 + 派生结果，前端按同规则重算
             with db() as c:
                 snap = c.execute(
                     "SELECT answers,rules_version,resonance,styles,care_top,animal FROM result_snapshots "
@@ -245,7 +175,6 @@ class Handler(BaseHTTPRequestHandler):
             })
 
         if path == "/api/face-check":
-            # 只存检测结论与风险分，原图从不上传、不落库
             score = data.get("riskScore")
             if not isinstance(score, int) or not 0 <= score <= 100:
                 return self._send(400, {"error": "bad riskScore"})

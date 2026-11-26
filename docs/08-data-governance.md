@@ -89,11 +89,22 @@
 
 ---
 
-## 6. 访问权限
+## 6. 访问权限（2026-11-26 加固）
 
-- `/api/stats` 仅供内部查看漏斗，部署后如公网可访问须加 token（当前阶段先仅限内网/本机）。
+- `/api/stats` 必须带 `X-Stats-Token` 请求头，令牌由服务端环境变量 `TP_STATS_TOKEN` 注入；
+  **未设置令牌时一律返回 403（fail-closed）**，避免公网直读漏斗数据。
+- CORS 改为白名单：只允许 `ALLOWED_ORIGINS` 中的同源域名；OPTIONS 预检对白名单外 Origin 返回 403。
+  前端通过 Caddy 同域反代调用 `/api/`，正常路径不触发预检。
 - 数据库文件仅 `root` 可读；禁止 Web 目录直接映射到 `/srv/tongpin-data/`。
-- 导出数据走 `scripts/stage0-export.mjs`，导出文件含手机号，属敏感文件，不得提交 git。
+- 导出走 `scripts/stage0-export.mjs`（服务器无 `sqlite3` CLI，脚本用 Python 标准库）；
+  导出文件含手机号，属敏感文件，`.gitignore` 已排除 `stage0-export*.csv`，不得提交 git。
+
+### 6.1 用户删除权（已实现）
+
+- `POST /api/delete` `{vid}`：一次性删除该 vid 在全部 7 张表中的记录（含预约手机号、加密生辰、人脸结论、结果快照）。
+- `POST /api/birth/delete` `{vid}`：仅删除生辰及其派生结果，保留测评画像。
+- 数据层见 `apps/stage0-api/store.py` 的 `delete_all()`，新增表必须同步加入 `TABLES` 元组，否则删除会漏表。
+- 回归测试：`python3 scripts/stage0-api-test.py`，覆盖鉴权、漏斗、加密、全量删除、CORS 白名单共 20 项断言。
 
 ---
 
@@ -102,6 +113,9 @@
 - [ ] 后端服务独立于 8765，绑定 127.0.0.1:8766
 - [ ] 事件与画像入库，日志与表中无生辰/时辰
 - [ ] 预约手机号入库并与 vid 绑定，可通过 `/api/link` 归并
-- [ ] `/api/stats` 可查漏斗计数
+- [ ] `/api/stats` 带令牌可查漏斗，无令牌 403
+- [ ] CORS 白名单外 Origin 被拒
+- [ ] `/api/delete` 可一次清空该 vid 全部 7 张表
+- [ ] `python3 scripts/stage0-api-test.py` 20 项断言全过
 - [ ] 数据目录与数据库权限达标
 - [ ] 前端埋点失败不影响测评主流程
