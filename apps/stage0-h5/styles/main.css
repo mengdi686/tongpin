@@ -1,0 +1,81 @@
+@import url('./tokens.css');
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: var(--font);
+  color: var(--ink);
+  background: radial-gradient(120% 60% at 50% 0%, #ffe8f0 0%, #f8f4f5 60%) fixed;
+  min-height: 100vh;
+}
+.app { max-width: 480px; margin: 0 auto; padding: 24px 18px 48px; }
+.hidden { display: none !important; }
+
+.brand { display: flex; align-items: center; gap: 8px; font-size: 20px; font-weight: 500; }
+.brand-mark { width: 30px; height: 30px; border-radius: 50%; background: var(--brand-grad); }
+.brand em { font-style: normal; font-size: 12px; color: var(--muted); margin-left: 4px; }
+
+.card {
+  background: var(--card);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 24px 20px;
+  margin-top: 20px;
+}
+h1 { font-size: 22px; font-weight: 500; margin: 20px 0 10px; }
+h2 { font-size: 17px; font-weight: 500; margin: 0 0 14px; }
+p { font-size: 14px; line-height: 1.7; color: var(--muted); margin: 8px 0; }
+.preline { white-space: pre-line; }
+
+.btn {
+  display: block; width: 100%; padding: 14px; border: none; border-radius: var(--radius-pill);
+  font-size: 15px; font-family: var(--font); font-weight: 500; cursor: pointer; margin-top: 16px;
+}
+.btn-primary { background: var(--brand-grad); color: #fff; }
+.btn-line { background: var(--soft); color: var(--ink); border: 1px solid var(--line); }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+
+.field { margin: 14px 0; }
+.field label { display: block; font-size: 13px; margin-bottom: 8px; }
+.field input, .field select {
+  width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: 12px;
+  font-size: 15px; font-family: var(--font); background: #fff; color: var(--ink);
+}
+.row { display: flex; gap: 10px; }
+.row > * { flex: 1; }
+
+.consent-list { padding-left: 18px; font-size: 13px; line-height: 1.8; color: var(--muted); }
+
+.progress-wrap { margin: 18px 0 8px; }
+.progress-bar { height: 4px; background: var(--line); border-radius: 4px; overflow: hidden; }
+.progress-bar span { display: block; height: 100%; background: var(--brand-grad); transition: width .2s; }
+.progress-text { font-size: 12px; color: var(--muted); margin-top: 6px; }
+
+.q-head { font-size: 12px; color: var(--muted); margin: 16px 0 6px; }
+.q-text { font-size: 16px; line-height: 1.6; margin-bottom: 16px; }
+.options { display: flex; flex-direction: column; gap: 8px; }
+.opt {
+  padding: 12px 14px; border: 1px solid var(--line); border-radius: 14px;
+  font-size: 14px; text-align: left; background: #fff; cursor: pointer; font-family: var(--font);
+}
+.opt.selected { border-color: var(--brand-pink); background: var(--brand-pink-soft); }
+.nav { display: flex; gap: 10px; margin-top: 18px; }
+.nav .btn { margin-top: 0; }
+
+.score-ring {
+  width: 130px; height: 130px; border-radius: 50%; margin: 8px auto;
+  background: var(--brand-grad); display: flex; align-items: center; justify-content: center;
+  flex-direction: column; color: #fff;
+}
+.score-ring b { font-size: 38px; font-weight: 500; line-height: 1; }
+.score-ring small { font-size: 11px; opacity: .9; margin-top: 6px; }
+.score-note { text-align: center; font-size: 11px; color: var(--brand-pink-deep); margin: 10px 0 20px; }
+
+.tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.tag { padding: 7px 14px; background: var(--brand-pink-soft); color: var(--brand-pink-deep); border-radius: var(--radius-pill); font-size: 13px; }
+.list-item { padding: 10px 0 10px 16px; border-left: 3px solid var(--brand-pink); margin: 8px 0; font-size: 14px; }
+
+.notice { background: #fff8e6; border: 1px solid #ffe2a8; border-radius: 12px; padding: 12px; font-size: 12px; line-height: 1.7; margin: 14px 0; }
+.disclaimer { font-size: 11px; line-height: 1.7; color: var(--muted); border-top: 1px solid var(--line); padding-top: 14px; margin-top: 22px; white-space: pre-line; }
+.toast { position: fixed; left: 50%; bottom: 40px; transform: translateX(-50%); background: rgba(34,28,35,.9); color: #fff; padding: 10px 18px; border-radius: var(--radius-pill); font-size: 13px; z-index: 99; }
+.share-canvas { width: 100%; max-width: 320px; display: block; margin: 16px auto 0; border-radius: 16px; }

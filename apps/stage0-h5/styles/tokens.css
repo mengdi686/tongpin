@@ -1,0 +1,18 @@
+/* 同频 · 设计令牌（沿用原型玫粉→紫体系） */
+:root {
+  --brand-pink: #ff4d8d;
+  --brand-pink-soft: #ffe8f0;
+  --brand-pink-deep: #e63a77;
+  --brand-purple: #8b5cff;
+  --brand-grad: linear-gradient(105deg, #ff4d8d 0%, #f858a8 46%, #8b5cff 100%);
+  --ink: #221c23;
+  --muted: #948b93;
+  --line: #f0e9ec;
+  --soft: #f7f2f4;
+  --card: #ffffff;
+  --shadow-card: 0 16px 38px rgba(196, 78, 128, .16);
+  --radius-card: 26px;
+  --radius-pill: 999px;
+  --radius-sheet: 24px;
+  --font: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
+}
