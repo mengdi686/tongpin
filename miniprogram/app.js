@@ -14,6 +14,9 @@ App({
     this.globalData.vid = vid;
     this.globalData.apiBase = API_BASE;
     api.track(vid, 'visit', {});
+    // 身份归并：拿到 AppID 并配置后端后，同一 vid 自动绑定 openid。
+    // 前端不感知成功与否（后端未配置时降级），失败静默。
+    api.login();
   },
   globalData: {
     vid: '',

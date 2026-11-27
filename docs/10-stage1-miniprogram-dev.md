@@ -44,12 +44,14 @@ miniprogram/
 5. 提交备案：个人主体只需身份证 + 实名手机号 + 邮箱；工信部短信核验需 24h 内完成。
 6. 用微信开发者工具打开 `miniprogram/` 目录，真机预览通过后上传提审。
 
-## 4. 后端需要补的一处（阶段2 再做）
+## 4. 身份锚点（已预留，未配置 AppID 时静默降级）
 
-`docs/09` 约定阶段1 用 vid、阶段2 用手机号归并（不静默合并 openid）。因此当前**不需要** `/api/wx-login`。
-若将来要拿 openid 作正式身份锚点，再在 `stage0-api` 加：
-- `POST /api/wx-login { code }` → 服务端用 appid+secret 换 openid → 返回绑定 vid。
-- appsecret 只存服务器环境变量，绝不进小程序包。
+`docs/09` 约定阶段1 用 vid、阶段2 用手机号归并（不静默合并 openid）。openid 只作身份锚点，不参与任何配对或推荐。
+
+- 前端 `app.js` 启动时调 `api.login()`：`wx.login` → code → `POST /api/wx-login`。
+- 后端 `POST /api/wx-login { code }` 用 appid+secret 调 `code2session` 换 openid，**加密落库**到 `identities` 表；只回脱敏尾号，`session_key` 绝不返回、绝不落库。
+- AppID/Secret 只存服务器环境变量 `TP_WX_APPID` / `TP_WX_SECRET`，绝不进小程序包与 git。**当前未配置**，接口返回 `{"ok":false,"reason":"not_configured"}`，小程序无感降级，不阻断测评。
+- 拿到 AppID 后在服务器 systemd 配置里填入这两个变量并重启 `tongpin-stage0` 即生效，无需改代码。
 
 ## 5. 已知简化与后续
 
@@ -62,5 +64,5 @@ miniprogram/
 - `node scripts/check.mjs`：PASS（15 项必需文件 + JSON 合法性 + 页面三件套 + lazyCodeLoading）
 - `node scripts/stage1-miniprogram-test.mjs`：**26 PASS / 0 FAIL**（结构 / 计分 / 与阶段0一致 / 动物文案 / 无配对断言）
 - `node scripts/stage0-stability.mjs`：200 次稳定性 PASS
-- `python3 scripts/stage0-api-test.py`：20 项 API 回归 PASS
+- `python3 scripts/stage0-api-test.py`：API 回归 PASS（含 wx-login 未配置降级 / 缺 code 拒绝）
 - 未执行：微信开发者工具真机编译（本机未安装），需在拿到 AppID 后由用户侧完成。

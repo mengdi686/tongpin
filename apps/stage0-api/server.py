@@ -7,10 +7,12 @@ import json
 import os
 import re
 import time
+import urllib.parse
+import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse
 
-from store import DATA_DIR, DB_PATH, db, init_db, touch, enc, clean_payload, delete_all
+from store import DATA_DIR, DB_PATH, db, init_db, touch, enc, clean_payload, delete_all, bind_identity
 
 HOST = os.environ.get("TP_HOST", "127.0.0.1")
 PORT = int(os.environ.get("TP_PORT", "8766"))
@@ -18,6 +20,9 @@ RULES_VERSION = "2026-11-26.1"
 PHONE_RE = re.compile(r"^1\d{10}$")
 # stats 鉴权：未设置令牌一律拒绝（fail-closed），避免公网直读漏斗数据
 STATS_TOKEN = os.environ.get("TP_STATS_TOKEN", "")
+# 小程序 code2session 凭据：未配置时 wx-login 返回降级，不阻断测评
+WX_APPID = os.environ.get("TP_WX_APPID", "")
+WX_SECRET = os.environ.get("TP_WX_SECRET", "")
 # 同源反代下浏览器不会预检；白名单仅用于将来前端独立域名时放行
 ALLOWED_ORIGINS = {
     "https://stage0.tongpin.truthhare.com",
@@ -87,6 +92,29 @@ class Handler(BaseHTTPRequestHandler):
         vid = str(data.get("vid", ""))[:64]
         if not vid:
             return self._send(400, {"error": "missing vid"})
+
+        if path == "/api/wx-login":
+            code = str(data.get("code", ""))[:64]
+            if not code:
+                return self._send(400, {"error": "missing code"})
+            if not WX_APPID or not WX_SECRET:
+                return self._send(200, {"ok": False, "reason": "not_configured"})
+            qs = urllib.parse.urlencode({
+                "appid": WX_APPID, "secret": WX_SECRET,
+                "js_code": code, "grant_type": "authorization_code",
+            })
+            try:
+                with urllib.request.urlopen(
+                        "https://api.weixin.qq.com/sns/jscode2session?" + qs, timeout=6) as resp:
+                    wxdata = json.loads(resp.read().decode("utf-8"))
+            except Exception:
+                return self._send(200, {"ok": False, "reason": "wx_unreachable"})
+            openid = str(wxdata.get("openid", ""))[:64]
+            if not openid:
+                return self._send(200, {"ok": False, "reason": "invalid_code"})
+            bind_identity(vid, openid, str(wxdata.get("unionid", ""))[:64])
+            # session_key 只用于本次解密，绝不返回、绝不落库
+            return self._send(200, {"ok": True, "openidTail": openid[-6:]})
 
         if path == "/api/event":
             etype = str(data.get("type", ""))[:40]

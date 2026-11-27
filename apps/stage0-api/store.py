@@ -13,7 +13,7 @@ DATA_DIR = os.environ.get("TP_DATA_DIR", "/srv/tongpin-data")
 DB_PATH = os.path.join(DATA_DIR, "stage0.db")
 KEY_PATH = os.path.join(DATA_DIR, ".fernet.key")
 TABLES = ("visitors", "events", "profiles", "reservations",
-          "births", "result_snapshots", "face_checks")
+          "births", "result_snapshots", "face_checks", "identities")
 
 
 def cipher():
@@ -71,6 +71,10 @@ def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT, vid TEXT NOT NULL,
             risk_score INTEGER NOT NULL, verdict TEXT NOT NULL, ts INTEGER NOT NULL
         );
+        CREATE TABLE IF NOT EXISTS identities (
+            vid TEXT PRIMARY KEY, openid_enc TEXT, unionid_enc TEXT,
+            created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL
+        );
         """)
 
 
@@ -101,6 +105,17 @@ def clean_payload(raw):
             if isinstance(v, (int, float, str, bool)) and len(str(v)) < 80:
                 safe[k] = v
     return safe
+
+
+def bind_identity(vid, openid, unionid=""):
+    """绑定小程序身份锚点。openid/unionid 加密留存，session_key 永不落库。"""
+    now = int(time.time())
+    with db() as c:
+        c.execute(
+            "INSERT INTO identities(vid,openid_enc,unionid_enc,created_at,updated_at) "
+            "VALUES(?,?,?,?,?) ON CONFLICT(vid) DO UPDATE SET "
+            "openid_enc=excluded.openid_enc,unionid_enc=excluded.unionid_enc,updated_at=excluded.updated_at",
+            (vid, enc(openid), enc(unionid) if unionid else None, now, now))
 
 
 def delete_all(vid):

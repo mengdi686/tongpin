@@ -21,6 +21,7 @@ global.wx = {
   getStorageSync: (k) => store[k],
   setStorageSync: (k, v) => { store[k] = v; },
   request: () => {},
+  login: ({ success }) => success && success({ code: 'fake_login_code' }),
   showToast: () => {},
   setClipboardData: () => {},
   navigateTo: () => {},

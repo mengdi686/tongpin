@@ -99,6 +99,11 @@ def main():
         check("人脸结论", call(port, "/api/face-check", {
             "vid": vid, "riskScore": 5, "verdict": "pass"})[0], 200)
         check("预约", call(port, "/api/reserve", {"vid": vid, "phone": "13800138000"})[0], 200)
+        # wx-login：测试环境未配置 AppID，必须优雅降级且返回 200（不阻断小程序主流程）
+        s, body = call(port, "/api/wx-login", {"vid": vid, "code": "fake_code_123"})
+        check("wx-login 未配置降级", s, 200)
+        check("wx-login 降级原因", body.get("reason"), "not_configured")
+        check("wx-login 缺 code 拒绝", call(port, "/api/wx-login", {"vid": vid})[0], 400)
 
         s, body = call(port, "/api/stats", headers={"X-Stats-Token": TOKEN})
         check("stats 访客计数", body.get("visitors"), 1)

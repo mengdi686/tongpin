@@ -51,4 +51,18 @@ function reserve(vid, phone) {
   return post('reserve', { phone });
 }
 
-module.exports = { track, saveResult, saveProfile, reserve, post };
+// wx.login → code → 后端 code2session 换 openid 作身份锚点。
+// 未配置 AppID/Secret 时后端降级返回，不影响测评主流程。
+function login() {
+  return new Promise((resolve) => {
+    wx.login({
+      success: (res) => {
+        if (!res || !res.code) return resolve(null);
+        post('wx-login', { code: res.code }).then(resolve);
+      },
+      fail: () => resolve(null),
+    });
+  });
+}
+
+module.exports = { track, saveResult, saveProfile, reserve, login, post };
