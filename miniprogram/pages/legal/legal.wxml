@@ -1,0 +1,9 @@
+<view class="page" wx:if="{{doc}}">
+  <view class="title">{{doc.title}}</view>
+  <view class="meta">{{doc.meta}}</view>
+  <view class="block" wx:for="{{doc.blocks}}" wx:key="h">
+    <view class="h">{{item.h}}</view>
+    <view class="p" wx:for="{{item.p}}" wx:for-item="line" wx:key="*this">{{line}}</view>
+  </view>
+  <view class="foot">同频 · 传统文化视角的相处风格自测工具，仅供娱乐参考</view>
+</view>

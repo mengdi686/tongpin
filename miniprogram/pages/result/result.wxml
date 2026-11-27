@@ -68,6 +68,10 @@
   </view>
 
   <button class="btn btn-line again" bindtap="onAgain">{{copy.result.again}}</button>
+  <view class="legal-links">
+    <text class="legal-link" bindtap="onLegal" data-type="privacy">《隐私政策》</text>
+    <text class="legal-link" bindtap="onLegal" data-type="terms">《用户协议》</text>
+  </view>
   <view class="delete-entry" bindtap="onDeleteData">{{copy.result.deleteData}}</view>
 
   <view class="disclaimer">{{copy.disclaimer}}</view>

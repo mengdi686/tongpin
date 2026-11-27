@@ -79,6 +79,8 @@ button::after { border: none; }
 .reserve-done { font-size: 28rpx; color: #e63a77; text-align: center; padding: 24rpx 0; }
 
 .again { margin-top: 32rpx; }
+.legal-links { display: flex; justify-content: center; gap: 28rpx; padding-top: 24rpx; }
+.legal-link { font-size: 24rpx; color: #e63a77; text-decoration: underline; }
 .delete-entry {
   text-align: center; font-size: 24rpx; color: #a89fa7;
   padding: 24rpx 0 8rpx; text-decoration: underline;

@@ -95,6 +95,9 @@
 
 button::after { border: none; }
 
+.legal-links { display: flex; gap: 28rpx; margin: 16rpx 0 24rpx; }
+.legal-link { font-size: 24rpx; color: #e63a77; text-decoration: underline; }
+
 .disclaimer {
   font-size: 22rpx;
   color: #a89fa7;

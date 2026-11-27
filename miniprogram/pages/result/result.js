@@ -70,10 +70,20 @@ Page({
       wx.showToast({ title: '请先勾选同意', icon: 'none' });
       return;
     }
-    api.reserve(app.globalData.vid, phone).then(() => {
+    api.reserve(app.globalData.vid, phone).then((ok) => {
+      // api.post 在网络失败时 resolve(null)；不能把失败误报成预约成功
+      if (!ok) {
+        wx.showToast({ title: '提交失败，请稍后重试', icon: 'none' });
+        return;
+      }
       this.setData({ reserved: true });
       api.track(app.globalData.vid, 'reserve_submit', {});
     });
+  },
+
+  onLegal(e) {
+    const type = e.currentTarget.dataset.type || 'privacy';
+    wx.navigateTo({ url: '/pages/legal/legal?type=' + type });
   },
 
   onDeleteData() {

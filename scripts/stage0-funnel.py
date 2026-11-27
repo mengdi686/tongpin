@@ -63,7 +63,20 @@ def report(d):
     print(f"  预约 ≥100：{d['reservations']}/100 "
           f"{'✅' if d['reservations'] >= 100 else '未达'}")
     enough = g('result_view') >= 20
+    share_rate = g('share_click') / g('result_view') if g('result_view') else 0
     print(f"  分享率 ≥15%：{'样本不足(<20 结果view)' if not enough else rate(g('share_click'), g('result_view'))}")
+    print(f"  付费访谈 ≥8/20：0/20（提纲见 docs/14，未开始）")
+    gate1 = d['reservations'] >= 100
+    gate2 = enough and share_rate >= 0.15
+    gate3 = False
+    if gate1 and gate2 and gate3:
+        print("  >>> 三条触发条件全部达标：可启动阶段2办证评估 <<<")
+    else:
+        todo = []
+        if not gate1: todo.append(f"预约还差 {max(0, 100 - d['reservations'])}")
+        if not gate2: todo.append("分享率未达标或样本不足")
+        todo.append("付费访谈未开始")
+        print("  >>> 阶段2 未启动；待办：" + "、".join(todo))
     return 0
 
 

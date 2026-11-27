@@ -35,7 +35,7 @@ global.Page = () => {};
 // ---- 结构检查 ----
 console.log('\n[结构]');
 const appJson = JSON.parse(fs.readFileSync(path.join(ROOT, 'app.json'), 'utf8'));
-check('app.json 页面非空', appJson.pages && appJson.pages.length === 3);
+check('app.json 页面齐全', appJson.pages && appJson.pages.length >= 3 && appJson.pages.includes('pages/legal/legal'));
 check('lazyCodeLoading 已设置', appJson.lazyCodeLoading === 'requiredComponents');
 for (const p of appJson.pages) {
   const base = path.join(ROOT, p);

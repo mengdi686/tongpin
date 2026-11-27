@@ -2,7 +2,8 @@
   "pages": [
     "pages/index/index",
     "pages/quiz/quiz",
-    "pages/result/result"
+    "pages/result/result",
+    "pages/legal/legal"
   ],
   "window": {
     "navigationBarTitleText": "同频 · 风格自测",

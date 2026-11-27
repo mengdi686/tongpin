@@ -23,6 +23,11 @@ Page({
     this.setData({ step: 'reject' });
   },
 
+  onLegal(e) {
+    const type = e.currentTarget.dataset.type || 'privacy';
+    wx.navigateTo({ url: '/pages/legal/legal?type=' + type });
+  },
+
   onStart() {
     const vid = getApp().globalData.vid;
     api.track(vid, 'consent_agree', {});
