@@ -4,7 +4,7 @@ import { L1_QUESTIONS, L2_QUESTIONS } from '../config/questions.js';
 import { computeResult } from './score.js';
 import { computeCulture } from './bazi.js';
 import { pickAnimal } from '../config/animals.js';
-import { track, trackProfile, trackResult, trackBirth, submitReserve } from './track.js';
+import { track, trackProfile, trackResult, trackBirth, submitReserve, deleteAll } from './track.js';
 import { renderShare, copyShare } from './share.js';
 
 const ALL = [...L1_QUESTIONS, ...L2_QUESTIONS];
@@ -178,6 +178,7 @@ function renderResult() {
       <div class="field" style="margin-top:18px"><input id="phone" placeholder="${COPY.result.reservePlaceholder}" inputmode="numeric" maxlength="11"></div>
       <button class="btn btn-line" id="reserve">${COPY.result.reserve}</button>
       <button class="btn btn-line" id="again">${COPY.result.again}</button>
+      <div class="delete-entry" id="deleteData">${COPY.result.deleteData}</div>
     </div>`;
 
   $('#share').onclick = () => { track('share_click'); const hook = renderShare(state.result, toast); $('#shareHook').textContent = hook; };
@@ -186,6 +187,14 @@ function renderResult() {
     toast(ok ? COPY.result.shareCopied : COPY.result.shareFailed);
   };
   $('#again').onclick = () => { track('again'); renderGate(); };
+  $('#deleteData').onclick = () => {
+    if (!window.confirm(COPY.result.deleteConfirm)) return;
+    deleteAll((ok) => {
+      if (!ok) return toast(COPY.result.deleteFail);
+      toast(COPY.result.deleteDone);
+      setTimeout(renderGate, 1200);
+    });
+  };
   $('#reserve').onclick = () => {
     const v = $('#phone').value.trim();
     if (!/^1\d{10}$/.test(v)) return toast(COPY.errors.badPhone);

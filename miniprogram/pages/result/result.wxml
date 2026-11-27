@@ -68,6 +68,7 @@
   </view>
 
   <button class="btn btn-line again" bindtap="onAgain">{{copy.result.again}}</button>
+  <view class="delete-entry" bindtap="onDeleteData">{{copy.result.deleteData}}</view>
 
   <view class="disclaimer">{{copy.disclaimer}}</view>
 

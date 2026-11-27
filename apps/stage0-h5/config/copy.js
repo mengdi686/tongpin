@@ -76,6 +76,10 @@ export const COPY = {
     reserve: '预约同频内测',
     reserveDone: '已收到，内测开放时我们会通知你',
     reservePlaceholder: '输入手机号（仅用于内测邀请）',
+    deleteData: '删除我的数据',
+    deleteConfirm: '删除后本次测评记录、预约手机号将永久清除，无法恢复。确定删除？',
+    deleteDone: '已删除全部数据',
+    deleteFail: '删除失败，请稍后重试',
   },
   disclaimer: '本测评为传统文化视角的自我了解工具，仅供娱乐参考。\n不是心理诊断，不构成婚恋建议，不代表关系成功概率。\n你的生辰信息仅用于本次计算，不留存、不公开、不用于匹配排序。',
   errors: {

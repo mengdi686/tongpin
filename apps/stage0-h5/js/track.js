@@ -70,4 +70,15 @@ export function submitReserve(phone, onDone) {
   } catch { onDone(false); }
 }
 
+// 删除权：一次清空该 vid 全部记录；返回删除结果供 UI 反馈
+export function deleteAll(onDone) {
+  try {
+    fetch(API + 'delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ vid: getVid() }),
+    }).then((r) => r.ok).then(onDone).catch(() => onDone && onDone(false));
+  } catch { onDone && onDone(false); }
+}
+
 export const vid = getVid;

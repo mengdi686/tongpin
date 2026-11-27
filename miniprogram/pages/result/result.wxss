@@ -79,4 +79,8 @@ button::after { border: none; }
 .reserve-done { font-size: 28rpx; color: #e63a77; text-align: center; padding: 24rpx 0; }
 
 .again { margin-top: 32rpx; }
-.disclaimer { font-size: 22rpx; color: #a89fa7; line-height: 1.6; text-align: center; margin-top: 40rpx; white-space: pre-line; }
+.delete-entry {
+  text-align: center; font-size: 24rpx; color: #a89fa7;
+  padding: 24rpx 0 8rpx; text-decoration: underline;
+}
+.disclaimer { font-size: 22rpx; color: #a89fa7; line-height: 1.6; text-align: center; margin-top: 24rpx; white-space: pre-line; }

@@ -65,4 +65,9 @@ function login() {
   });
 }
 
-module.exports = { track, saveResult, saveProfile, reserve, login, post };
+// 删除权：一次清空该 vid 的全部记录（含手机号、加密生辰、结果快照）
+function deleteAll() {
+  return post('delete', {});
+}
+
+module.exports = { track, saveResult, saveProfile, reserve, login, deleteAll, post };

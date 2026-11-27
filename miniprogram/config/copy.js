@@ -54,6 +54,10 @@ const COPY = {
     reserveDone: '已收到，内测开放时我们会通知你',
     reservePlaceholder: '输入手机号（仅用于内测邀请）',
     reserveAgree: '我同意将上述手机号用于内测邀请联系',
+    deleteData: '删除我的数据',
+    deleteConfirm: '删除后本次测评记录、预约手机号将永久清除，无法恢复。确定删除？',
+    deleteDone: '已删除全部数据',
+    deleteFail: '删除失败，请稍后重试',
   },
   disclaimer: '本测评为传统文化视角的自我了解工具，仅供娱乐参考。\n不是心理诊断，不构成婚恋建议，不代表关系成功概率。',
 };

@@ -76,6 +76,28 @@ Page({
     });
   },
 
+  onDeleteData() {
+    wx.showModal({
+      title: COPY.result.deleteData,
+      content: COPY.result.deleteConfirm,
+      confirmText: '确定删除',
+      confirmColor: '#e63a77',
+      success: (res) => {
+        if (!res.confirm) return;
+        api.deleteAll().then((ok) => {
+          if (!ok) {
+            wx.showToast({ title: COPY.result.deleteFail, icon: 'none' });
+            return;
+          }
+          app.globalData.answers = {};
+          app.globalData.result = null;
+          wx.showToast({ title: COPY.result.deleteDone, icon: 'none' });
+          setTimeout(() => wx.redirectTo({ url: '/pages/index/index' }), 1200);
+        });
+      },
+    });
+  },
+
   onAgain() {
     app.globalData.answers = {};
     app.globalData.result = null;
