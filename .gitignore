@@ -16,3 +16,6 @@ unpackage/
 __pycache__/
 *.pyc
 stage0-export*.csv
+
+# 微信开发者工具本机设置（不进版本库）
+miniprogram/project.private.config.json
