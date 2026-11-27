@@ -28,6 +28,7 @@ const REQUIRED = [
   'miniprogram/pages/quiz/quiz.wxml',
   'miniprogram/pages/result/result.wxml',
   'scripts/stage1-miniprogram-test.mjs',
+  'scripts/stage1-compliance-check.mjs',
 ];
 
 // 注册/向导/资料卡等由 JS 动态生成的 id，允许不在静态 HTML 中
@@ -104,7 +105,16 @@ if (has('miniprogram/app.json')) {
   if (appJson.lazyCodeLoading !== 'requiredComponents') errors.push('小程序缺少 lazyCodeLoading: requiredComponents');
 }
 
-// 5. 文档内 file:/// 链接是否有效
+// 5. 阶段1 提审前合规自查（禁用词/配对断言/诱导分享/社交/支付/导流）
+if (has('scripts/stage1-compliance-check.mjs')) {
+  try {
+    execFileSync(process.execPath, [p('scripts/stage1-compliance-check.mjs')], { stdio: 'pipe' });
+  } catch (e) {
+    errors.push(`小程序合规自查未通过：\n${e.stdout?.toString() || e.stderr?.toString() || e.message}`);
+  }
+}
+
+// 6. 文档内 file:/// 链接是否有效
 function walk(dir) {
   if (!fs.existsSync(dir)) return [];
   return fs.readdirSync(dir, { withFileTypes: true }).flatMap((d) => {
@@ -130,4 +140,4 @@ if (errors.length) {
   for (const e of errors) console.log(`  - ${e}`);
   process.exit(1);
 }
-console.log('\nPASS：JS 语法 / CSS 括号 / id 唯一 / id 引用 / 文档链接');
+console.log('\nPASS：JS 语法 / CSS 括号 / id 唯一 / id 引用 / 小程序结构 / 提审合规 / 文档链接');
