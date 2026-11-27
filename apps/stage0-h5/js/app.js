@@ -141,6 +141,9 @@ function renderResult() {
     ? `<p class="notice">${culture.note}</p><p>${culture.text}</p>`
     : `<p>${culture.text}</p>`;
   const extendedHtml = culture.extended ? `<div class="culture-extended">${culture.extended}</div>` : '';
+  const loreHtml = culture.lore
+    ? `<div class="culture-lore"><span>五行小知识</span>${culture.lore}</div>`
+    : '';
 
   $('#app').innerHTML = `
     <div class="brand"><span class="brand-mark"></span>${COPY.brand}</div>
@@ -167,6 +170,7 @@ function renderResult() {
       <h2 style="margin-top:22px">${COPY.result.cultureTitle}</h2>
       ${cultureHtml}
       ${extendedHtml}
+      ${loreHtml}
       <pre class="disclaimer">${COPY.disclaimer}</pre>
       <div class="share-preview" id="shareHook"></div>
       <button class="btn btn-primary" id="share">${COPY.result.share}</button>

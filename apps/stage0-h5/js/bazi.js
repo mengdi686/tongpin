@@ -38,6 +38,24 @@ const WUXING_TRAIT = {
   水: '心思通透，相处不费劲',
 };
 
+// 同一五行给多条确定性变体：用日干索引选取，重测同生日结果不变，不同日干更有新鲜感
+const WUXING_TRAITS = {
+  木: ['向上生长，认准了就认真', '看着温和，主意其实很正', '给自己留一片自留地'],
+  火: ['自带热度，靠近了就知道', '情绪来得快，暖得也快', '天生会把场子炒热'],
+  土: ['稳稳当当，适合慢慢相处', '不爱折腾，但很靠得住', '把日子过得踏实'],
+  金: ['有棱有角，也很护短', '看着冷，其实最护自己人', '喜欢把事情做得漂亮'],
+  水: ['心思通透，相处不费劲', '想法多，但不急着表态', '遇事总能绕到另一条路'],
+};
+
+// 五行对应的传统季节与方位，纯文化常识科普，不涉及个人运势与关系推断
+const WUXING_LORE = {
+  木: '木对应春天与东方，传统里讲的是生发',
+  火: '火对应夏天与南方，传统里讲的是明亮',
+  土: '土对应长夏与中央，传统里讲的是承载',
+  金: '金对应秋天与西方，传统里讲的是收敛',
+  水: '水对应冬天与北方，传统里讲的是流动',
+};
+
 // 时辰索引：23:00-01:00 子，01:00-03:00 丑 ...
 export function timeBranchIndex(hour) {
   return Math.floor(((hour + 1) % 24) / 2);
@@ -62,7 +80,11 @@ export function computeCulture({ date, time, timeSkipped, Lunar }) {
   const dayMaster = WUXING[dayGan] || '—';
   const yearWu = WUXING[yearGan] || '—';
   const zodiac = ZODIAC[yearZhi] || '—';
-  const trait = WUXING_TRAIT[dayMaster] || '有自己的节奏';
+  const traitPool = WUXING_TRAITS[dayMaster] || [WUXING_TRAIT[dayMaster] || '有自己的节奏'];
+  // 日干字符在池中取模：确定性、无随机，同一生辰永远同一短句
+  const traitIndex = dayGan.charCodeAt(0) % traitPool.length;
+  const trait = traitPool[traitIndex];
+  const lore = WUXING_LORE[dayMaster] || '五行是古人对世界的一种分类方式';
 
   const note = timeSkipped ? COPY.result.insufficient : '';
   const pillars = timeSkipped ? [ec.getYear(), ec.getMonth(), ec.getDay()] : [ec.getYear(), ec.getMonth(), ec.getDay(), ec.getTime()];
@@ -80,6 +102,7 @@ export function computeCulture({ date, time, timeSkipped, Lunar }) {
     yearWu,
     zodiac,
     trait,
+    lore,
     note,
     text,
     extended,
@@ -87,4 +110,4 @@ export function computeCulture({ date, time, timeSkipped, Lunar }) {
   };
 }
 
-export const BaziMeta = { WUXING, ZODIAC, TIME_BRANCH, WUXING_TRAIT };
+export const BaziMeta = { WUXING, ZODIAC, TIME_BRANCH, WUXING_TRAIT, WUXING_TRAITS, WUXING_LORE };

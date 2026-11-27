@@ -103,6 +103,15 @@ p { font-size: 14px; line-height: 1.7; color: var(--muted); margin: 8px 0; }
   border-radius: 0 12px 12px 0; padding: 12px 14px; margin: 12px 0;
   font-size: 13px; line-height: 1.75; color: var(--brand-pink-deep);
 }
+.culture-lore {
+  background: #f7f4ec; border-left: 3px solid #b89b5e;
+  border-radius: 0 12px 12px 0; padding: 12px 14px; margin: 12px 0;
+  font-size: 13px; line-height: 1.75; color: #6b5a35;
+}
+.culture-lore span {
+  display: inline-block; font-size: 11px; font-weight: 500; color: #8a7442;
+  background: #efe7d1; border-radius: 999px; padding: 2px 9px; margin-right: 8px;
+}
 .share-canvas { width: 100%; max-width: 320px; display: block; margin: 16px auto 0; border-radius: 16px; }
 .share-preview {
   background: var(--brand-pink-soft); color: var(--brand-pink-deep); border-radius: var(--radius-pill);

@@ -18,7 +18,9 @@ export function shareHook(r) {
   const list = COPY.result.hooks;
   const tpl = list[Math.floor(Math.random() * list.length) % list.length];
   return tpl.replace('{animal}', r.animal?.name || '神秘小动物')
-            .replace('{resonance}', String(r.resonance));
+            .replace('{resonance}', String(r.resonance))
+            .replace('{dayMaster}', r.culture?.dayMaster || '神秘')
+            .replace('{zodiac}', r.culture?.zodiac || '神秘');
 }
 
 export function shareText(r) {
@@ -68,6 +70,16 @@ function wrap(ctx, text, x, y, maxWidth, lineHeight) {
   return cy;
 }
 
+function roundRect(ctx, x, y, w, h, radius) {
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.arcTo(x + w, y, x + w, y + h, radius);
+  ctx.arcTo(x + w, y + h, x, y + h, radius);
+  ctx.arcTo(x, y + h, x, y, radius);
+  ctx.arcTo(x, y, x + w, y, radius);
+  ctx.closePath();
+}
+
 function drawCard(r, hook) {
   const canvas = document.createElement('canvas');
   canvas.width = 640; canvas.height = 1120;
@@ -75,46 +87,54 @@ function drawCard(r, hook) {
   ctx.fillStyle = '#fff5f8'; ctx.fillRect(0, 0, 640, 1120);
   ctx.fillStyle = '#ff4d8d'; ctx.fillRect(0, 0, 640, 12);
 
-  // 好奇文案：分享卡片的钩子，放大加粗，朋友一眼看到才愿意点
+  // 固定分区布局：钩子最多占三行，其余按固定坐标排布，避免长文案挤压底部免责
   ctx.fillStyle = '#221c23'; ctx.font = '500 40px sans-serif';
   ctx.fillText(COPY.brand + ' · ' + COPY.slogan, 40, 92);
   ctx.fillStyle = '#e63a77'; ctx.font = 'bold 42px sans-serif';
-  const afterHook = wrap(ctx, hook, 40, 176, 560, 58);
+  wrap(ctx, hook, 40, 176, 560, 58);
 
-  // 同频占比 + 风格词
+  // 同频占比 + 风格词（固定坐标，不随钩子行数漂移）
   ctx.fillStyle = '#e63a77'; ctx.font = '500 46px sans-serif';
-  ctx.fillText(`约 ${r.resonance}% 的人与你同频`, 40, afterHook + 76);
+  ctx.fillText(`约 ${r.resonance}% 的人与你同频`, 40, 372);
   ctx.fillStyle = '#948b93'; ctx.font = '21px sans-serif';
-  ctx.fillText(COPY.result.scoreNote, 40, afterHook + 116);
-  ctx.fillStyle = '#221c23'; ctx.font = '500 30px sans-serif';
-  r.styles.forEach((s, i) => ctx.fillText('· ' + s, 40, afterHook + 176 + i * 48));
+  ctx.fillText(COPY.result.scoreNote, 40, 412);
+  ctx.fillStyle = '#221c23'; ctx.font = '500 28px sans-serif';
+  r.styles.slice(0, 3).forEach((s, i) => ctx.fillText('· ' + s, 40, 470 + i * 46));
 
-  // 动物图：居中圆形玫粉底 + 本地 SVG，说明文字放图片下方用满宽度
-  // cy 在风格词之后，避免圆形遮住第三个风格词（最多 3 个，行高 48）
-  const cx = 320, cy = afterHook + 360;
+  // 动物图：居中圆形玫粉底 + 本地 SVG
+  const cx = 320, cy = 672;
   ctx.fillStyle = '#ffd9e6';
-  ctx.beginPath(); ctx.arc(cx, cy, 108, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = '#221c23'; ctx.font = '500 26px sans-serif';
+  ctx.beginPath(); ctx.arc(cx, cy, 96, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#221c23'; ctx.font = '500 25px sans-serif';
   if (r.animal) {
     const label = r.animal.name + '：' + r.animal.line;
-    wrap(ctx, label, 40, cy + 158, 560, 36);
+    wrap(ctx, label, 40, cy + 132, 560, 34);
   }
-  ctx.fillStyle = '#948b93'; ctx.font = '19px sans-serif';
-  ctx.fillText(COPY.result.animalNote, 40, cy + 236);
+  ctx.fillStyle = '#948b93'; ctx.font = '18px sans-serif';
+  ctx.fillText(COPY.result.animalNote, 40, cy + 204);
 
-  // 关系在意点前两条 + 文化短句，压缩行距给底部免责留空间
-  ctx.fillStyle = '#221c23'; ctx.font = '26px sans-serif';
-  ctx.fillText(r.care[0] || '', 40, cy + 278);
-  ctx.fillText(r.care[1] || '', 40, cy + 316);
+  // 关系在意点前两条
+  ctx.fillStyle = '#221c23'; ctx.font = '25px sans-serif';
+  ctx.fillText(r.care[0] || '', 40, cy + 248);
+  ctx.fillText(r.care[1] || '', 40, cy + 284);
+
+  // 文化名片：日主圆标 + 生肖短句，做成带底色的身份卡，凸显文化层又不放生辰
   if (r.culture?.shareLine) {
-    ctx.fillStyle = '#e63a77'; ctx.font = '500 27px sans-serif';
-    ctx.fillText(r.culture.shareLine, 40, cy + 364);
+    const boxY = cy + 314;
+    ctx.fillStyle = '#fff0f5'; ctx.strokeStyle = '#ffc9dc'; ctx.lineWidth = 1.5;
+    roundRect(ctx, 40, boxY, 560, 80, 14); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#e63a77';
+    ctx.beginPath(); ctx.arc(92, boxY + 40, 28, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.font = '500 30px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(r.culture.dayMaster || '五', 92, boxY + 50);
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#993556'; ctx.font = '500 25px sans-serif';
+    wrap(ctx, r.culture.shareLine, 138, boxY + 48, 448, 32);
   }
 
   // 底部固定免责
   ctx.fillStyle = '#948b93'; ctx.font = '18px sans-serif';
-  const disclaimerTop = Math.min(cy + 410, 1010);
-  COPY.disclaimer.split('\n').forEach((line, i) => ctx.fillText(line, 40, disclaimerTop + i * 26));
+  COPY.disclaimer.split('\n').forEach((line, i) => ctx.fillText(line, 40, 1020 + i * 26));
   return { canvas, animal: r.animal, cx, cy };
 }
 
