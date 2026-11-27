@@ -17,6 +17,7 @@
 | `docs/08-data-governance.md` | 契约 | 数据表、个人信息清单、删除权、访问权限 |
 | `docs/09-stage1-miniapp-boundary.md` | 契约 | 阶段 1 个人主体工具版小程序的功能白/黑名单 |
 | `docs/10-stage1-miniprogram-dev.md` | 说明 | 阶段 1 小程序工程结构、AppID 配置、与阶段0 一致性、验收 |
+| `docs/11-stage0-metrics.md` | 契约 | 阶段0 运营指标固定口径、阶段2 触发条件、基线快照 |
 | `miniprogram/` | 代码 | 阶段 1 个人主体工具版小程序原生工程 |
 
 ## 2. 技术栈（已拍板，不另行选型）

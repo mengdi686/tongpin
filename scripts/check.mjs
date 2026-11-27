@@ -17,6 +17,7 @@ const REQUIRED = [
   'docs/00-mvp-scope.md',
   'docs/01-compliance.md',
   'docs/07-stage0-assessment.md',
+  'docs/11-stage0-metrics.md',
   'apps/stage0-h5/index.html',
   'app/match.html',
   'app/match.css',
