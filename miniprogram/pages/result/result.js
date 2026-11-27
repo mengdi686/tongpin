@@ -2,6 +2,7 @@ const app = getApp();
 const { computeResult } = require('../../utils/score.js');
 const { COPY, pickAnimal, pickHook } = require('../../config/copy.js');
 const api = require('../../utils/api.js');
+const { renderShareCard } = require('../../utils/share-card.js');
 
 Page({
   data: {
@@ -9,6 +10,7 @@ Page({
     result: null,
     animal: null,
     hook: '',
+    shareImage: '',
     phone: '',
     agreed: false,
     reserved: false,
@@ -30,14 +32,18 @@ Page({
     api.track(vid, 'result_view', { resonance: result.resonance });
     api.saveResult(vid, answers, result);
     api.saveProfile(vid, result.resonance, result.styles, result.care, animal.id);
+
+    // 生成分享卡图；失败时 imageUrl 留空，微信自动截图，不影响分享主流程
+    renderShareCard(this, result, hook, animal).then((imageUrl) => {
+      if (imageUrl) this.setData({ shareImage: imageUrl });
+    });
   },
 
   onShareAppMessage() {
-    const r = this.data.result;
     return {
       title: this.data.hook,
-      path: '/pages/index/index',
-      imageUrl: '',
+      path: '/pages/index/index?ref=' + (app.globalData.vid || ''),
+      imageUrl: this.data.shareImage || '',
     };
   },
 

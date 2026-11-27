@@ -1,5 +1,8 @@
 <view class="page" wx:if="{{result}}">
 
+  <!-- 隐藏画布：仅用于生成转发卡片图，不参与页面布局 -->
+  <canvas type="2d" id="shareCard" class="share-canvas-hidden"></canvas>
+
   <view class="hero">
     <view class="hero-title">{{copy.result.title}}</view>
     <view class="score-block">

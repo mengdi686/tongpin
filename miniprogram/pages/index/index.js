@@ -7,8 +7,13 @@ Page({
     step: 'gate',
   },
 
-  onLoad() {
+  onLoad(options) {
     this.setData({ step: 'gate' });
+    // 分享归因：朋友点转发卡片进入时带 ref（分享者 vid），只记事件不落地社交关系
+    const ref = (options && options.ref) || '';
+    if (ref && ref !== getApp().globalData.vid) {
+      api.track(getApp().globalData.vid, 'ref_in', { ref: ref.slice(0, 64) });
+    }
   },
 
   onAdult() {

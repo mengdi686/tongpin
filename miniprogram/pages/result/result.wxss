@@ -86,3 +86,5 @@ button::after { border: none; }
   padding: 24rpx 0 8rpx; text-decoration: underline;
 }
 .disclaimer { font-size: 22rpx; color: #a89fa7; line-height: 1.6; text-align: center; margin-top: 24rpx; white-space: pre-line; }
+/* 隐藏但可导出：display:none 会使 2d canvas 无尺寸，改用绝对定位移出屏幕 */
+.share-canvas-hidden { position: fixed; left: -9999rpx; top: -9999rpx; width: 640px; height: 1120px; }
