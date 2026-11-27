@@ -30,6 +30,9 @@ const REQUIRED = [
   'miniprogram/pages/result/result.wxml',
   'scripts/stage1-miniprogram-test.mjs',
   'scripts/stage1-compliance-check.mjs',
+  'scripts/generate-avatar.py',
+  'assets/avatar/tongpin-avatar-144.png',
+  'miniprogram/assets/avatar.png',
 ];
 
 // 注册/向导/资料卡等由 JS 动态生成的 id，允许不在静态 HTML 中

@@ -2,6 +2,7 @@
 
   <!-- 年龄门 -->
   <view class="gate" wx:if="{{step === 'gate'}}">
+    <image class="brand-avatar" src="/assets/avatar.png" mode="aspectFit" />
     <view class="brand">{{copy.brand}}</view>
     <view class="slogan">{{copy.slogan}}</view>
     <view class="card gate-card">
@@ -20,6 +21,7 @@
 
   <!-- 知情同意 -->
   <view class="gate" wx:elif="{{step === 'consent'}}">
+    <image class="brand-avatar" src="/assets/avatar.png" mode="aspectFit" />
     <view class="brand">{{copy.brand}}</view>
     <view class="lead">{{copy.lead}}</view>
     <view class="card consent-card">

@@ -1,5 +1,5 @@
 {
-  "description": "WorkBuddy 原生微信小程序基础模板",
+  "description": "同频 - 传统文化视角的相处风格自测工具",
   "packOptions": {
     "ignore": [
       {
@@ -18,6 +18,6 @@
   },
   "compileType": "miniprogram",
   "appid": "touristappid",
-  "projectname": "workbuddy-native-basic",
+  "projectname": "tongpin-selfcheck",
   "miniprogramRoot": "./"
 }

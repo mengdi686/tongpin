@@ -7,13 +7,21 @@
 
 .gate { width: 100%; }
 
+.brand-avatar {
+  display: block;
+  width: 144rpx;
+  height: 144rpx;
+  margin: 0 auto;
+  border-radius: 32rpx;
+}
+
 .brand {
   font-size: 64rpx;
   font-weight: 700;
   color: #e63a77;
   letter-spacing: 6rpx;
   text-align: center;
-  margin-top: 60rpx;
+  margin-top: 24rpx;
 }
 
 .slogan {
