@@ -93,7 +93,7 @@ function pickAnimal(resonance, random) {
   const band = ANIMAL_BANDS.find((b) => resonance >= b.min && resonance <= b.max) || ANIMAL_BANDS[ANIMAL_BANDS.length - 1];
   const index = Math.min(band.ids.length - 1, Math.floor(rnd() * band.ids.length));
   const id = band.ids[index];
-  return { id, name: ANIMALS[id].name, line: ANIMALS[id].line };
+  return { id, name: ANIMALS[id].name, file: ANIMALS[id].file, line: ANIMALS[id].line };
 }
 
 function pickHook(animal, resonance, random) {

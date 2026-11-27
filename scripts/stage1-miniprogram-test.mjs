@@ -86,6 +86,9 @@ const seq = [0.01, 0.5, 0.99];
 for (const res of [20, 50, 70, 90]) {
   const a = pickAnimal(res, () => seq[res % 3]);
   check(`同频${res} 动物合法`, !!(a && a.name && a.line), JSON.stringify(a));
+  // 动物图必须带 file 字段且图片真实存在，否则小程序 image src 会变成 .../undefined 静默失败
+  const imgPath = path.join(ROOT, 'assets/animals', a.file || '');
+  check(`同频${res} 动物图存在`, !!(a.file && fs.existsSync(imgPath)), a.file || '(no file field)');
 }
 const hook = pickHook(pickAnimal(60, () => 0.1), 60, () => 0);
 check('钩子含好奇文案', hook.length > 4, hook);
