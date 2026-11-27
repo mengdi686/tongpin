@@ -38,9 +38,22 @@
 
   <view class="card animal-card">
     <view class="section-title">{{copy.result.animalTitle}}</view>
+    <image class="animal-img" src="/assets/animals/{{animal.file}}" mode="aspectFit" binderror="onAnimalImgError" wx:if="{{animalImgOk}}" />
     <view class="animal-name">{{animal.name}}</view>
     <view class="animal-line">{{animal.line}}</view>
     <view class="animal-note">{{copy.result.animalNote}}</view>
+  </view>
+
+  <view class="card culture-card" wx:if="{{culture.available}}">
+    <view class="section-title">你的文化名片</view>
+    <view class="culture-head">
+      <view class="culture-badge">{{culture.dayMaster}}</view>
+      <view class="culture-line">{{culture.shareLine}}</view>
+    </view>
+    <view class="culture-text">{{culture.text}}</view>
+    <view class="culture-note" wx:if="{{culture.note}}">{{culture.note}}</view>
+    <view class="culture-lore">{{culture.lore}}</view>
+    <view class="culture-extended">{{culture.extended}}</view>
   </view>
 
   <view class="card share-card">

@@ -37,6 +37,7 @@ Page({
     const vid = getApp().globalData.vid;
     api.track(vid, 'consent_agree', {});
     getApp().globalData.answers = {};
-    wx.navigateTo({ url: '/pages/quiz/quiz' });
+    getApp().globalData.birth = null;
+    wx.navigateTo({ url: '/pages/birth/birth' });
   },
 });

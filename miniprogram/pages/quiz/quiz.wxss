@@ -86,10 +86,10 @@
 
 .btn {
   flex: 1;
-  height: 92rpx;
-  line-height: 92rpx;
-  border-radius: 20rpx;
-  font-size: 32rpx;
+  height: 76rpx;
+  line-height: 76rpx;
+  border-radius: 16rpx;
+  font-size: 30rpx;
   font-weight: 600;
   text-align: center;
   border: none;

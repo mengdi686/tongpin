@@ -40,7 +40,8 @@ const COPY = {
     animalNote: '按分数段随机出场，纯图一乐，和性格结论无关。',
     shareTitle: '分享卡片文案',
     shareCopy: '复制文案',
-    shareSaved: '已复制，粘贴给朋友即可打开小程序一起测',
+    shareSaved: '已复制，粘贴给朋友即可打开',
+    urlHint: '测测你是什么动物 →',
     copyFail: '复制失败，请手动选择文字',
     hooks: [
       '我居然是{animal}！你敢不敢测测自己？',
@@ -48,6 +49,13 @@ const COPY = {
       '一只{animal}诞生了，这结果也太会了吧 👀',
       '花 2 分钟测出我的相处模式，结果有点上头',
       '本来想随便点一下，结果看完沉默了三秒…',
+    ],
+    // 转发卡片标题：用好奇钩子引导点击，不含"转发后解锁"等违规诱导
+    shareTitles: [
+      '测测你是什么动物？',
+      '你的文化名片是啥，敢不敢测？',
+      '一只小动物诞生了，猜猜是哪个 👀',
+      '2 分钟看看你在关系里的样子',
     ],
     again: '再测一次',
     reserve: '预约同频内测',
@@ -63,14 +71,14 @@ const COPY = {
 };
 
 const ANIMALS = {
-  monkey: { name: '机灵猴', line: '脑子转得比网速快，唯一的 bug 是追着自己尾巴跑。' },
-  owl: { name: '熬夜猫头鹰', line: '白天眯眼装高冷，一到夜里精神得像续了三杯奶茶。' },
-  seal: { name: '软乎海豹', line: '看着在发呆，其实正忙着给自己挑第 8 个舒服的姿势。' },
-  penguin: { name: '蹦迪企鹅', line: '走路一摇三晃自带背景音乐，站着不动都能萌。' },
-  sloth: { name: '摆烂树懒', line: '急事到我这儿自动变成已读不回，别催，催了也是 0.5 倍速。' },
-  hippo: { name: '戏多河马', line: '表面泡水装佛系，心里的小剧场已经演到第八集大结局。' },
-  crocodile: { name: '营业鳄鱼', line: '别看我咧嘴笑，那是营业表情，下班后我比谁都想躺平。' },
-  octopus: { name: '时间管理章鱼', line: '八条腿同时忙，还能抽一条给你比心，时间管理大师本人。' },
+  monkey: { name: '机灵猴', file: 'animals_monkey_1.svg', line: '脑子转得比网速快，唯一的 bug 是追着自己尾巴跑。' },
+  owl: { name: '熬夜猫头鹰', file: 'animals_bird_owl.svg', line: '白天眯眼装高冷，一到夜里精神得像续了三杯奶茶。' },
+  seal: { name: '软乎海豹', file: 'animals_seal_baby.svg', line: '看着在发呆，其实正忙着给自己挑第 8 个舒服的姿势。' },
+  penguin: { name: '蹦迪企鹅', file: 'animals_bird_penguin_03.svg', line: '走路一摇三晃自带背景音乐，站着不动都能萌。' },
+  sloth: { name: '摆烂树懒', file: 'animals_mamals_bear_sloth_01.svg', line: '急事到我这儿自动变成已读不回，别催，催了也是 0.5 倍速。' },
+  hippo: { name: '戏多河马', file: 'animal_bulky_hippo.svg', line: '表面泡水装佛系，心里的小剧场已经演到第八集大结局。' },
+  crocodile: { name: '营业鳄鱼', file: 'animals_crocodile_alligator.svg', line: '别看我咧嘴笑，那是营业表情，下班后我比谁都想躺平。' },
+  octopus: { name: '时间管理章鱼', file: 'animals_octopus.svg', line: '八条腿同时忙，还能抽一条给你比心，时间管理大师本人。' },
 };
 
 const ANIMAL_BANDS = [
@@ -94,4 +102,11 @@ function pickHook(animal, resonance, random) {
   return COPY.result.hooks[i].replace('{animal}', animal.name).replace('{resonance}', resonance);
 }
 
-module.exports = { COPY, ANIMALS, pickAnimal, pickHook };
+// 转发标题：好奇钩子，不参与计分、不含配对断言
+function pickShareTitle(random) {
+  const rnd = random || Math.random;
+  const list = COPY.result.shareTitles;
+  return list[Math.min(list.length - 1, Math.floor(rnd() * list.length))];
+}
+
+module.exports = { COPY, ANIMALS, pickAnimal, pickHook, pickShareTitle };

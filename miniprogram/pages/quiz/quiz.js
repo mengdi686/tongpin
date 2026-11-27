@@ -40,22 +40,30 @@ Page({
 
   onChoose(e) {
     const value = Number(e.currentTarget.dataset.value);
-    const q = QUESTIONS[this.data.index];
+    const idx = this.data.index;
+    const q = QUESTIONS[idx];
     getApp().globalData.answers[q.id] = value;
     this.setData({ answer: value });
     api.track(getApp().globalData.vid, 'q_answer', { qid: q.id, value });
+    // 点选即自动前进：先让用户看到选中态，再切下一题；最后一题直接出结果。
+    // 防重入：正在切换时忽略后续点击。
+    if (this._advancing) return;
+    this._advancing = true;
+    const go = () => {
+      this._advancing = false;
+      if (idx === TOTAL - 1) {
+        wx.redirectTo({ url: '/pages/result/result' });
+      } else {
+        this.render(idx + 1);
+      }
+    };
+    if (this._advanceTimer) clearTimeout(this._advanceTimer);
+    this._advanceTimer = setTimeout(go, 220);
   },
 
   onBack() {
+    if (this._advanceTimer) { clearTimeout(this._advanceTimer); this._advanceTimer = null; }
+    this._advancing = false;
     if (this.data.index > 0) this.render(this.data.index - 1);
-  },
-
-  onNext() {
-    if (!this.data.answer) return;
-    if (this.data.isLast) {
-      wx.redirectTo({ url: '/pages/result/result' });
-    } else {
-      this.render(this.data.index + 1);
-    }
   },
 });

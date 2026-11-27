@@ -22,7 +22,7 @@ function wrap(ctx, text, x, y, maxWidth, lineHeight) {
 
 // 在页面内创建一个隐藏的 2d canvas 节点，绘制后导出临时文件路径。
 // 需要在 wxml 中放置 <canvas type="2d" id="shareCard" class="share-canvas-hidden" />。
-function renderShareCard(page, result, hook, animal) {
+function renderShareCard(page, result, hook, animal, culture) {
   return new Promise((resolve) => {
     wx.createSelectorQuery()
       .in(page)
@@ -86,6 +86,40 @@ function renderShareCard(page, result, hook, animal) {
         ctx.font = '25px sans-serif';
         ctx.fillText((result.care || [])[0] || '', 40, cy + 248);
         ctx.fillText((result.care || [])[1] || '', 40, cy + 284);
+
+        // 文化名片：日主圆标 + 短句，仅作身份标签，不含生辰与任何结论
+        if (culture && culture.available && culture.shareLine) {
+          const boxY = cy + 314;
+          ctx.fillStyle = '#fff0f5';
+          ctx.strokeStyle = '#ffc9dc';
+          ctx.lineWidth = 1.5;
+          // 手绘圆角矩形，兼容小程序 canvas 2d（不依赖 roundRect API）
+          ctx.beginPath();
+          ctx.moveTo(54, boxY);
+          ctx.lineTo(586, boxY);
+          ctx.quadraticCurveTo(600, boxY, 600, boxY + 14);
+          ctx.lineTo(600, boxY + 66);
+          ctx.quadraticCurveTo(600, boxY + 80, 586, boxY + 80);
+          ctx.lineTo(54, boxY + 80);
+          ctx.quadraticCurveTo(40, boxY + 80, 40, boxY + 66);
+          ctx.lineTo(40, boxY + 14);
+          ctx.quadraticCurveTo(40, boxY, 54, boxY);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+          ctx.fillStyle = '#e63a77';
+          ctx.beginPath();
+          ctx.arc(92, boxY + 40, 28, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = '#fff';
+          ctx.font = '500 30px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(culture.dayMaster || '五', 92, boxY + 50);
+          ctx.textAlign = 'left';
+          ctx.fillStyle = '#993556';
+          ctx.font = '500 25px sans-serif';
+          wrap(ctx, culture.shareLine, 138, boxY + 48, 448, 32);
+        }
 
         ctx.fillStyle = '#948b93';
         ctx.font = '18px sans-serif';

@@ -24,9 +24,8 @@
 
   <view class="nav-row">
     <button class="btn btn-line" wx:if="{{index > 0}}" bindtap="onBack">上一题</button>
-    <button class="btn btn-primary" wx:if="{{answer}}" bindtap="onNext">{{isLast ? '查看结果' : '下一题'}}</button>
   </view>
 
-  <view class="sub-hint">{{sectionSub}}</view>
+  <view class="sub-hint">点选选项后自动进入下一题 · {{sectionSub}}</view>
 
 </view>

@@ -1,15 +1,19 @@
 const app = getApp();
 const { computeResult } = require('../../utils/score.js');
-const { COPY, pickAnimal, pickHook } = require('../../config/copy.js');
+const { COPY, pickAnimal, pickHook, pickShareTitle } = require('../../config/copy.js');
 const api = require('../../utils/api.js');
 const { renderShareCard } = require('../../utils/share-card.js');
+const { computeCulture } = require('../../utils/bazi.js');
 
 Page({
   data: {
     copy: COPY,
     result: null,
     animal: null,
+    animalImgOk: true,
+    culture: null,
     hook: '',
+    shareTitle: '',
     shareImage: '',
     phone: '',
     agreed: false,
@@ -25,30 +29,38 @@ Page({
     const result = computeResult(answers);
     const animal = pickAnimal(result.resonance);
     const hook = pickHook(animal, result.resonance);
+    const shareTitle = pickShareTitle();
+    const birth = app.globalData.birth;
+    const culture = birth ? computeCulture(birth) : { available: false };
     app.globalData.result = result;
-    this.setData({ result, animal, hook });
+    this.setData({ result, animal, hook, shareTitle, culture });
 
     const vid = app.globalData.vid;
     api.track(vid, 'result_view', { resonance: result.resonance });
     api.saveResult(vid, answers, result);
     api.saveProfile(vid, result.resonance, result.styles, result.care, animal.id);
+    // 生辰加密落库（用户已在生日页单独同意）
+    if (birth && culture.available) api.saveBirth(birth, culture);
 
     // 生成分享卡图；失败时 imageUrl 留空，微信自动截图，不影响分享主流程
-    renderShareCard(this, result, hook, animal).then((imageUrl) => {
+    renderShareCard(this, result, hook, animal, culture).then((imageUrl) => {
       if (imageUrl) this.setData({ shareImage: imageUrl });
     });
   },
 
   onShareAppMessage() {
     return {
-      title: this.data.hook,
+      title: this.data.shareTitle || this.data.hook,
       path: '/pages/index/index?ref=' + (app.globalData.vid || ''),
       imageUrl: this.data.shareImage || '',
     };
   },
 
   onCopy() {
-    const text = this.data.hook + '\n搜索小程序「' + COPY.brand + '」或点我发你的卡片，一起测测。';
+    // 复制文案带可点击 H5 链接 + ref 短码（与分享卡片同源），朋友点开可追来源
+    const ref = String(app.globalData.vid || '').replace(/^v_/, '').replace(/[^A-Za-z0-9]/g, '').slice(0, 8) || 'direct';
+    const url = 'https://stage0.tongpin.truthhare.com/?ref=' + ref;
+    const text = this.data.hook + '\n' + COPY.result.urlHint + ' ' + url;
     wx.setClipboardData({
       data: text,
       success: () => {
@@ -56,6 +68,11 @@ Page({
         api.track(app.globalData.vid, 'share_copy', {});
       },
     });
+  },
+
+  // 部分真机不支持 SVG image：失败时隐藏图片，动物名与描述文字照常显示
+  onAnimalImgError() {
+    this.setData({ animalImgOk: false });
   },
 
   onPhone(e) {

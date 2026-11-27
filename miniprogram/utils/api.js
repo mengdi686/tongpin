@@ -70,4 +70,17 @@ function deleteAll() {
   return post('delete', {});
 }
 
-module.exports = { track, saveResult, saveProfile, reserve, login, deleteAll, post };
+// 生辰经 HTTPS 传服务端加密落库；consent 为用户单独勾选取证
+function saveBirth(birthInfo, culture) {
+  return post('birth', {
+    consent: true,
+    date: birthInfo.date,
+    time: birthInfo.time,
+    gender: birthInfo.gender,
+    dayMaster: culture.dayMaster,
+    elements: culture.counts,
+    zodiac: culture.zodiac,
+  });
+}
+
+module.exports = { track, saveResult, saveProfile, saveBirth, reserve, login, deleteAll, post };
