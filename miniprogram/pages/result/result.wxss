@@ -7,10 +7,6 @@
 
 .hero { text-align: center; padding: 24rpx 0 40rpx; }
 .hero-title { font-size: 40rpx; font-weight: 700; color: #221c23; }
-/* 动物图提到结果页最顶部：玫粉圆底容器，第一眼可见 */
-.hero-animal { width: 176rpx; height: 176rpx; margin: 20rpx auto 8rpx; background: #ffe4ee; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-.hero-animal-img { display: block; width: 128rpx; height: 158rpx; }
-.hero-animal-name { font-size: 32rpx; font-weight: 600; color: #e63a77; margin-bottom: 8rpx; }
 
 .score-block { margin: 32rpx 0 12rpx; }
 .score-label { font-size: 28rpx; color: #948b93; display: block; }
@@ -51,6 +47,9 @@
 .advice { font-size: 28rpx; color: #5a5159; line-height: 1.7; }
 
 .animal-card { text-align: center; }
+/* 动物图：玫粉圆底容器，整块卡片已在结果页最顶部 */
+.animal-img-wrap { width: 200rpx; height: 200rpx; margin: 8rpx auto 16rpx; background: #ffe4ee; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.animal-img { display: block; width: 150rpx; height: 185rpx; }
 .animal-name { font-size: 44rpx; font-weight: 700; color: #e63a77; margin: 12rpx 0; }
 .animal-line { font-size: 28rpx; color: #5a5159; line-height: 1.7; }
 .animal-note { font-size: 22rpx; color: #a89fa7; margin-top: 20rpx; }

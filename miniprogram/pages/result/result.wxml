@@ -5,15 +5,22 @@
 
   <view class="hero">
     <view class="hero-title">{{copy.result.title}}</view>
-    <view class="hero-animal" wx:if="{{animalImgOk}}">
-      <image class="hero-animal-img" src="/assets/animals/{{animal.file}}" mode="aspectFit" binderror="onAnimalImgError" />
-    </view>
-    <view class="hero-animal-name">{{animal.name}}</view>
     <view class="score-block">
       <text class="score-label">{{copy.result.scoreLabel}}</text>
       <text class="score-value">{{result.resonance}}{{copy.result.scoreUnit}}</text>
     </view>
     <view class="score-note">{{copy.result.scoreNote}}</view>
+  </view>
+
+  <!-- 同频小动物：整块提到结果页最顶部，第一屏可见 -->
+  <view class="card animal-card">
+    <view class="section-title">{{copy.result.animalTitle}}</view>
+    <view class="animal-img-wrap" wx:if="{{animalImgOk}}">
+      <image class="animal-img" src="/assets/animals/{{animal.file}}" mode="aspectFit" binderror="onAnimalImgError" />
+    </view>
+    <view class="animal-name">{{animal.name}}</view>
+    <view class="animal-line">{{animal.line}}</view>
+    <view class="animal-note">{{copy.result.animalNote}}</view>
   </view>
 
   <view class="card">
@@ -38,13 +45,6 @@
   <view class="card">
     <view class="section-title">{{copy.result.adviceTitle}}</view>
     <view class="advice">{{result.advice}}</view>
-  </view>
-
-  <view class="card animal-card">
-    <view class="section-title">{{copy.result.animalTitle}}</view>
-    <view class="animal-name">{{animal.name}}</view>
-    <view class="animal-line">{{animal.line}}</view>
-    <view class="animal-note">{{copy.result.animalNote}}</view>
   </view>
 
   <view class="card culture-card" wx:if="{{culture.available}}">
