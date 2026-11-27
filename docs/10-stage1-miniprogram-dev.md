@@ -98,8 +98,8 @@ miniprogram/
 - 前端 `app.js` 启动时调 `api.login()`：`wx.login` → code → `POST /api/wx-login`。
 - 后端 `POST /api/wx-login { code }` 用 appid+secret 调 `code2session` 换 openid，**加密落库**到 `identities` 表；只回脱敏尾号，`session_key` 绝不返回、绝不落库。
 - AppID/Secret 只存服务器环境变量 `TP_WX_APPID` / `TP_WX_SECRET`，绝不进小程序包与 git（**AppID 填在 `project.config.json` 属微信工具必需、非敏感；Secret 绝不进 git**）。
-- **当前状态（2026-11-27）**：服务器已配 `TP_WX_APPID=wx2879fb1594869063`，`TP_WX_SECRET` 待用户从微信后台「开发管理 → 开发设置 → AppSecret」获取并告知；缺 Secret 时接口返回 `{"ok":false,"reason":"not_configured"}`，小程序无感降级，不阻断测评与提审。
-- 拿到 Secret 后在服务器 systemd 配置里填入 `TP_WX_SECRET` 并 `systemctl daemon-reload && systemctl restart tongpin-stage0` 即生效，无需改代码。
+- **当前状态（2026-11-27）**：服务器已配 `TP_WX_APPID=wx2879fb1594869063` 与 `TP_WX_SECRET`（Secret 仅存服务器 systemd，权限 600，绝不进 git/文档/日志）。线上已用假 code 验证接口返回 `{"ok":false,"reason":"invalid_code"}`，证明确实在调微信 `code2session`；真机用真 code 可完成 openid 锚点链路。
+- 凭据只存服务器环境变量，轮换时改 systemd 后 `systemctl daemon-reload && systemctl restart tongpin-stage0` 即生效，无需改代码。
 
 ## 5. 已知简化与后续
 
