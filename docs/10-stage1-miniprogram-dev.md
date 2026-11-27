@@ -36,7 +36,7 @@ miniprogram/
 ## 3. 拿到 AppID 后要做的配置（用户操作）
 
 1. 微信公众平台 → 开发管理 → 开发设置 → 拿到 **AppID**（个人主体，无需认证）。
-2. 用 AppID 替换 `miniprogram/project.config.json` 的 `appid` 字段（当前 `touristappid`）。
+2. ✅ 已用 AppID `wx2879fb1594869063` 替换 `miniprogram/project.config.json` 的 `appid` 字段（原 `touristappid`）。
 3. 开发管理 → 开发设置 → **服务器域名** → `request 合法域名` 添加：
    `https://stage0.tongpin.truthhare.com`
    （域名已备案、已配 HTTPS；小程序 request 只接受 https 且备案域名）
@@ -87,7 +87,7 @@ miniprogram/
 - ☐ 免责声明在结果页可见
 
 **配置核对**
-- ☐ `project.config.json` 的 appid 已换成真实 AppID（不再是 `touristappid`）
+- ☑ `project.config.json` 的 appid 已换成真实 AppID `wx2879fb1594869063`（不再是 `touristappid`）
 - ☐ request 合法域名已加 `https://stage0.tongpin.truthhare.com`（开发者工具「详情 → 本地设置」勾选"不校验合法域名"仅用于调试，提审前必须关掉）
 - ☐ 类目 `工具 > 信息查询`，与"纯测评"定位一致
 
@@ -97,8 +97,9 @@ miniprogram/
 
 - 前端 `app.js` 启动时调 `api.login()`：`wx.login` → code → `POST /api/wx-login`。
 - 后端 `POST /api/wx-login { code }` 用 appid+secret 调 `code2session` 换 openid，**加密落库**到 `identities` 表；只回脱敏尾号，`session_key` 绝不返回、绝不落库。
-- AppID/Secret 只存服务器环境变量 `TP_WX_APPID` / `TP_WX_SECRET`，绝不进小程序包与 git。**当前未配置**，接口返回 `{"ok":false,"reason":"not_configured"}`，小程序无感降级，不阻断测评。
-- 拿到 AppID 后在服务器 systemd 配置里填入这两个变量并重启 `tongpin-stage0` 即生效，无需改代码。
+- AppID/Secret 只存服务器环境变量 `TP_WX_APPID` / `TP_WX_SECRET`，绝不进小程序包与 git（**AppID 填在 `project.config.json` 属微信工具必需、非敏感；Secret 绝不进 git**）。
+- **当前状态（2026-11-27）**：服务器已配 `TP_WX_APPID=wx2879fb1594869063`，`TP_WX_SECRET` 待用户从微信后台「开发管理 → 开发设置 → AppSecret」获取并告知；缺 Secret 时接口返回 `{"ok":false,"reason":"not_configured"}`，小程序无感降级，不阻断测评与提审。
+- 拿到 Secret 后在服务器 systemd 配置里填入 `TP_WX_SECRET` 并 `systemctl daemon-reload && systemctl restart tongpin-stage0` 即生效，无需改代码。
 
 ## 5. 已知简化与后续
 
