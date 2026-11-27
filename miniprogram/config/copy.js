@@ -71,14 +71,14 @@ const COPY = {
 };
 
 const ANIMALS = {
-  monkey: { name: '机灵猴', file: 'animals_monkey_1.svg', line: '脑子转得比网速快，唯一的 bug 是追着自己尾巴跑。' },
-  owl: { name: '熬夜猫头鹰', file: 'animals_bird_owl.svg', line: '白天眯眼装高冷，一到夜里精神得像续了三杯奶茶。' },
-  seal: { name: '软乎海豹', file: 'animals_seal_baby.svg', line: '看着在发呆，其实正忙着给自己挑第 8 个舒服的姿势。' },
-  penguin: { name: '蹦迪企鹅', file: 'animals_bird_penguin_03.svg', line: '走路一摇三晃自带背景音乐，站着不动都能萌。' },
-  sloth: { name: '摆烂树懒', file: 'animals_mamals_bear_sloth_01.svg', line: '急事到我这儿自动变成已读不回，别催，催了也是 0.5 倍速。' },
-  hippo: { name: '戏多河马', file: 'animal_bulky_hippo.svg', line: '表面泡水装佛系，心里的小剧场已经演到第八集大结局。' },
-  crocodile: { name: '营业鳄鱼', file: 'animals_crocodile_alligator.svg', line: '别看我咧嘴笑，那是营业表情，下班后我比谁都想躺平。' },
-  octopus: { name: '时间管理章鱼', file: 'animals_octopus.svg', line: '八条腿同时忙，还能抽一条给你比心，时间管理大师本人。' },
+  monkey: { name: '机灵猴', file: 'animals_monkey_1.png', line: '脑子转得比网速快，唯一的 bug 是追着自己尾巴跑。' },
+  owl: { name: '熬夜猫头鹰', file: 'animals_bird_owl.png', line: '白天眯眼装高冷，一到夜里精神得像续了三杯奶茶。' },
+  seal: { name: '软乎海豹', file: 'animals_seal_baby.png', line: '看着在发呆，其实正忙着给自己挑第 8 个舒服的姿势。' },
+  penguin: { name: '蹦迪企鹅', file: 'animals_bird_penguin_03.png', line: '走路一摇三晃自带背景音乐，站着不动都能萌。' },
+  sloth: { name: '摆烂树懒', file: 'animals_mamals_bear_sloth_01.png', line: '急事到我这儿自动变成已读不回，别催，催了也是 0.5 倍速。' },
+  hippo: { name: '戏多河马', file: 'animal_bulky_hippo.png', line: '表面泡水装佛系，心里的小剧场已经演到第八集大结局。' },
+  crocodile: { name: '营业鳄鱼', file: 'animals_crocodile_alligator.png', line: '别看我咧嘴笑，那是营业表情，下班后我比谁都想躺平。' },
+  octopus: { name: '时间管理章鱼', file: 'animals_octopus.png', line: '八条腿同时忙，还能抽一条给你比心，时间管理大师本人。' },
 };
 
 const ANIMAL_BANDS = [
