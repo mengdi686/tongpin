@@ -239,11 +239,16 @@ class Handler(BaseHTTPRequestHandler):
                 return c.execute(f"SELECT COUNT(*) FROM {t}").fetchone()[0]
             by_type = {r["type"]: r["n"] for r in c.execute(
                 "SELECT type, COUNT(*) n FROM events GROUP BY type")}
+            # 按 vid 去重：漏斗转化率必须用独立访客数，否则重测/刷新会重复计数
+            # 导致 result_view/gate_pass > 100% 的失真（同一 vid 多次查看结果）
+            by_type_unique = {r["type"]: r["n"] for r in c.execute(
+                "SELECT type, COUNT(DISTINCT vid) n FROM events GROUP BY type")}
             self._send(200, {
                 "ok": True, "visitors": count("visitors"), "events": count("events"),
                 "profiles": count("profiles"), "reservations": count("reservations"),
                 "births": count("births"), "snapshots": count("result_snapshots"),
                 "faceChecks": count("face_checks"), "byType": by_type,
+                "byTypeUnique": by_type_unique,
             })
 
 

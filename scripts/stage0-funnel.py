@@ -46,15 +46,18 @@ def report(d):
     if not d.get("ok"):
         print("拉取失败：", d)
         return 1
-    bt = d.get("byType", {})
+    # 漏斗用按 vid 去重的口径（byTypeUnique），避免重测/刷新导致 >100% 失真
+    bt = d.get("byTypeUnique") or d.get("byType", {})
     g = lambda k: bt.get(k, 0)
+    dedup = "按独立访客去重" if d.get("byTypeUnique") else "事件次数(旧口径)"
     print("同频 · 阶段0 漏斗快照")
     print(f"  访客 {d['visitors']} · 事件 {d['events']} · 画像 {d['profiles']} · "
           f"预约 {d['reservations']} · 生辰 {d['births']} · 快照 {d['snapshots']}")
+    print(f"  漏斗口径：{dedup}")
     print("  ── 漏斗 ──")
     print(f"  年龄门通过     {g('gate_pass'):>4}  / visit {g('visit'):<4} = {rate(g('gate_pass'), g('visit'))}")
     print(f"  同意测评       {g('consent_agree'):>4}")
-    print(f"  查看结果       {g('result_view'):>4}  / 年龄门 {g('gate_pass'):<4} = {rate(g('result_view'), g('gate_pass'))}")
+    print(f"  查看结果       {g('result_view'):>4}  / visit {g('visit'):<4} = {rate(g('result_view'), g('visit'))}")
     print(f"  点分享         {g('share_click'):>4}  / 结果   {g('result_view'):<4} = {rate(g('share_click'), g('result_view'))}")
     print(f"  复制分享       {g('share_copy'):>4}")
     print(f"  分享带来新访客 {g('ref_in'):>4}  ← 传播闭环指标")
