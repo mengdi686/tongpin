@@ -59,6 +59,7 @@ const COPY = {
     ],
     again: '再测一次',
     reserve: '预约同频内测',
+    reserveBenefit: '内测开放第一时间通知你，并送一份专属相处建议。仅用于邀请，不发送营销短信。',
     reserveDone: '已收到，内测开放时我们会通知你',
     reservePlaceholder: '输入手机号（仅用于内测邀请）',
     reserveAgree: '我同意将上述手机号用于内测邀请联系',

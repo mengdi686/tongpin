@@ -175,7 +175,8 @@ function renderResult() {
       <div class="share-preview" id="shareHook"></div>
       <button class="btn btn-primary" id="share">${COPY.result.share}</button>
       <button class="btn btn-line" id="shareCopy">${COPY.result.shareCopy}</button>
-      <div class="field" style="margin-top:18px"><input id="phone" placeholder="${COPY.result.reservePlaceholder}" inputmode="numeric" maxlength="11"></div>
+      <p class="sub" style="margin-top:18px">${COPY.result.reserveBenefit}</p>
+      <div class="field"><input id="phone" placeholder="${COPY.result.reservePlaceholder}" inputmode="numeric" maxlength="11"></div>
       <button class="btn btn-line" id="reserve">${COPY.result.reserve}</button>
       <button class="btn btn-line" id="again">${COPY.result.again}</button>
       <div class="delete-entry" id="deleteData">${COPY.result.deleteData}</div>

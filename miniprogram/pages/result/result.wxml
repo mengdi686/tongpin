@@ -68,6 +68,7 @@
 
   <view class="card reserve-card">
     <view class="section-title">{{copy.result.reserve}}</view>
+    <view class="reserve-benefit">{{copy.result.reserveBenefit}}</view>
     <block wx:if="{{!reserved}}">
       <input
         class="phone-input"
